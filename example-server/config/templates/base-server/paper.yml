@@ -1,0 +1,11 @@
+messages:
+  no-permission: "&cVous n'avez pas la permission d'exécuter cette commande"
+  kick:
+    authentication-servers-down: ''
+    connection-throttle: Veuillez patienter avant de vous reconnecter.
+    flying-player: Le vol n'est pas activé sur ce serveur
+    flying-vehicle: Le vol n'est pas activé sur ce serveur
+world-settings:
+  default:
+    anti-xray:
+      enabled: true

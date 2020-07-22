@@ -1,0 +1,15 @@
+listeners:
+  - query_port: 25565
+    motd: ''
+    host: 0.0.0.0:25565
+    max_players: 100
+servers:
+  lobby:
+    motd: ''
+    address: localhost:25566
+    restricted: false
+  test:
+    motd: ''
+    address: localhost:25567
+    restricted: true
+ip_forward: true

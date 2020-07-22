@@ -1,0 +1,8 @@
+{
+  "name": "Waterfall",
+  "type": "waterfall",
+  "version": "1.15",
+  "extends": [],
+  "variables": {},
+  "port": 25565
+}

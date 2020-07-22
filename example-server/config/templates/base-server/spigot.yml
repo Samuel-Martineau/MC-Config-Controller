@@ -1,0 +1,11 @@
+settings:
+  restart-on-crash: true
+  restart-script: ./restart.sh
+  bungeecord: true
+messages:
+  whitelist: You are not whitelisted on this server!
+  unknown-command: Commande inconnue. Utilisez « /help » pour obtenir de l'aide.
+  server-full: Le serveur est plein!
+  outdated-client: Client obsolète! Veuillez utiliser {0}
+  outdated-server: Serveur obsolète! Veuillez utiliser {0}
+  restart: Le serveur redémarre

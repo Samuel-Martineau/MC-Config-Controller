@@ -1,0 +1,8 @@
+{
+  "name": "Test",
+  "type": "paper",
+  "version": "1.15.2",
+  "extends": ["Base Server"],
+  "restricted": false,
+  "port": 25566
+}
