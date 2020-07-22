@@ -20,7 +20,8 @@ class PaperDownloader implements ServerDownloader {
   PaperDownloader(this._cacheDir, {this.verbose = false})
       : _logger = Logger(verbose) {
     _vanillaDownloader = VanillaDownloader(_cacheDir, verbose: verbose);
-    _cachedDownloads = _cacheDir.listSync();
+    _cachedDownloads =
+        _cacheDir.listSync().map((file) => File(file.path)).toList();
   }
 
   @override
@@ -30,26 +31,27 @@ class PaperDownloader implements ServerDownloader {
     }
 
     final build = _cachedBuilds[version];
-    final fileName = 'paper-$version-$build.jar';
+    final cacheFileName = 'paper-$version-$build.jar';
+    final fileName = 'server.jar';
 
-    _logger.log('Downloading $fileName...');
+    _logger.log('Downloading $cacheFileName...');
 
     final cachedDownload = _cachedDownloads.firstWhere(
-        (cachedDownload) => p.basename(cachedDownload.path) == fileName,
+        (cachedDownload) => p.basename(cachedDownload.path) == cacheFileName,
         orElse: () => null);
 
     if (cachedDownload != null) {
-      _logger.log('Already downloaded $fileName, using cache');
+      _logger.log('Already downloaded $cacheFileName, using cache');
       await cachedDownload.copy(p.join(outDir.path, fileName));
     } else {
       final response = await http
           .get('https://papermc.io/api/v1/paper/$version/$build/download');
-      final cacheFile = await File(p.join(_cacheDir.path, fileName))
+      final cacheFile = await File(p.join(_cacheDir.path, cacheFileName))
           .writeAsBytes(response.bodyBytes);
       _cachedDownloads.add(cacheFile);
       await cacheFile.copy(p.join(outDir.path, fileName));
     }
-    _logger.log('Done downloading $fileName');
+    _logger.log('Done downloading $cacheFileName');
 
     await _vanillaDownloader.download(version, outDir);
   }

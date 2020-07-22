@@ -17,7 +17,8 @@ class SpongeDownloader implements ServerDownloader {
 
   SpongeDownloader(this._cacheDir, {this.verbose = false})
       : _logger = Logger(verbose) {
-    _cachedDownloads = _cacheDir.listSync();
+    _cachedDownloads =
+        _cacheDir.listSync().map((file) => File(file.path)).toList();
   }
 
   @override
@@ -52,12 +53,12 @@ class SpongeDownloader implements ServerDownloader {
   static Future<String> getLatestBuild(MCVersion version) async {
     final webScraper = WebScraper('https://files.minecraftforge.net');
     await webScraper.loadWebPage(
-        'https://files.minecraftforge.net/maven/org/spongepowered/spongeforge/index_$version.html');
-    var links = webScraper
+        '/maven/org/spongepowered/spongeforge/index_$version.html');
+    final links = webScraper
         .getElement('div.download > div.links > div.link > a', ['href']);
     final regex = RegExp(
         r'^\/maven\/org\/spongepowered\/spongeforge\/[\d.]+-(.*)\/spongeforge-.*.\.jar$');
-    Match match = regex.firstMatch(links.last[0]);
+    Match match = regex.firstMatch(links.first['attributes']['href']);
     final build = match.group(1);
     return build;
   }

@@ -17,7 +17,8 @@ class WaterfallDownloader implements ServerDownloader {
 
   WaterfallDownloader(this._cacheDir, {this.verbose = false})
       : _logger = Logger(verbose) {
-    _cachedDownloads = _cacheDir.listSync();
+    _cachedDownloads =
+        _cacheDir.listSync().map((file) => File(file.path)).toList();
   }
 
   @override
@@ -27,26 +28,27 @@ class WaterfallDownloader implements ServerDownloader {
     }
 
     final build = _cachedBuilds[version];
-    final fileName = 'waterfall-$version-$build.jar';
+    final cacheFileName = 'waterfall-$version-$build.jar';
+    final fileName = 'server.jar';
 
-    _logger.log('Downloading $fileName...');
+    _logger.log('Downloading $cacheFileName...');
 
     final cachedDownload = _cachedDownloads.firstWhere(
-        (cachedDownload) => p.basename(cachedDownload.path) == fileName,
+        (cachedDownload) => p.basename(cachedDownload.path) == cacheFileName,
         orElse: () => null);
 
     if (cachedDownload != null) {
-      _logger.log('Already downloaded $fileName, using cache');
+      _logger.log('Already downloaded $cacheFileName, using cache');
       await cachedDownload.copy(p.join(outDir.path, fileName));
     } else {
       final response = await http
           .get('https://papermc.io/api/v1/waterfall/$version/$build/download');
-      final cacheFile = await File(p.join(_cacheDir.path, fileName))
+      final cacheFile = await File(p.join(_cacheDir.path, cacheFileName))
           .writeAsBytes(response.bodyBytes);
       _cachedDownloads.add(cacheFile);
       await cacheFile.copy(p.join(outDir.path, fileName));
     }
-    _logger.log('Done downloading $fileName');
+    _logger.log('Done downloading $cacheFileName');
   }
 
   static Future<String> getLatestBuild(MCVersion version) async {

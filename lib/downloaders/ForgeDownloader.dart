@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/downloaders/ServerDownloader.dart';
+import 'package:Config_Controller/downloaders/SpongeDownloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:web_scraper/web_scraper.dart';
@@ -13,11 +14,14 @@ class ForgeDownloader implements ServerDownloader {
   final bool verbose;
   final Logger _logger;
 
+  SpongeDownloader _spongeDownloader;
   List<File> _cachedDownloads;
 
   ForgeDownloader(this._cacheDir, {this.verbose = false})
       : _logger = Logger(verbose) {
-    _cachedDownloads = _cacheDir.listSync();
+    _spongeDownloader = SpongeDownloader(_cacheDir, verbose: verbose);
+    _cachedDownloads =
+        _cacheDir.listSync().map((file) => File(file.path)).toList();
   }
 
   @override
@@ -32,26 +36,29 @@ class ForgeDownloader implements ServerDownloader {
     }
 
     final build = _cachedBuilds[version];
-    final fileName = 'forge-$version-$build.jar';
+    final cacheFileName = 'forge-$version-$build.jar';
+    final fileName = 'forge-installer.jar';
 
-    _logger.log('Downloading $fileName...');
+    _logger.log('Downloading $cacheFileName...');
 
     final cachedDownload = _cachedDownloads.firstWhere(
-        (cachedDownload) => p.basename(cachedDownload.path) == fileName,
+        (cachedDownload) => p.basename(cachedDownload.path) == cacheFileName,
         orElse: () => null);
 
     if (cachedDownload != null) {
-      _logger.log('Already downloaded $fileName, using cache');
+      _logger.log('Already downloaded $cacheFileName, using cache');
       await cachedDownload.copy(p.join(outDir.path, fileName));
     } else {
       final response = await http.get(
           'https://files.minecraftforge.net/maven/net/minecraftforge/forge/$version-$build/forge-$version-$build-installer.jar');
-      final cacheFile = await File(p.join(_cacheDir.path, fileName))
+      final cacheFile = await File(p.join(_cacheDir.path, cacheFileName))
           .writeAsBytes(response.bodyBytes);
       _cachedDownloads.add(cacheFile);
       await cacheFile.copy(p.join(outDir.path, fileName));
     }
-    _logger.log('Done downloading $fileName');
+    _logger.log('Done downloading $cacheFileName');
+
+    await _spongeDownloader.download(version, outDir);
   }
 
   static Future<String> getLatestBuild(MCVersion version) async {
