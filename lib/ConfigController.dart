@@ -11,30 +11,30 @@ import 'Server.dart';
 import 'downloaders/ForgeDownloader.dart';
 
 class ConfigContoller {
-  final String path;
+  final String _path;
   final bool verbose;
+  final _logger;
 
-  final logger;
+  Directory _rootDir;
+  Directory _serversDir;
+  Directory _cacheDir;
+  Directory _configDir;
+  Directory _configServersDir;
+  Directory _configTemplatesDir;
 
-  Directory rootDir;
-  Directory serversDir;
-  Directory cacheDir;
-  Directory configDir;
-  Directory configServersDir;
-  Directory configTemplatesDir;
-
-  ConfigContoller(this.path, {this.verbose = false})
-      : logger = Logger(verbose) {
-    rootDir = Directory(p.join(Directory.current.path, path));
-    serversDir = Directory(p.join(rootDir.path, 'servers'));
-    cacheDir = Directory(p.join(rootDir.path, 'cache'));
-    configDir = Directory(p.join(rootDir.path, 'config'));
-    configServersDir = Directory(p.join(rootDir.path, 'config', 'servers'));
-    configTemplatesDir = Directory(p.join(rootDir.path, 'config', 'templates'));
+  ConfigContoller(this._path, {this.verbose = false})
+      : _logger = Logger(verbose) {
+    _rootDir = Directory(p.join(Directory.current.path, _path));
+    _serversDir = Directory(p.join(_rootDir.path, 'servers'));
+    _cacheDir = Directory(p.join(_rootDir.path, 'cache'));
+    _configDir = Directory(p.join(_rootDir.path, 'config'));
+    _configServersDir = Directory(p.join(_rootDir.path, 'config', 'servers'));
+    _configTemplatesDir =
+        Directory(p.join(_rootDir.path, 'config', 'templates'));
   }
 
   void generateConfig() async {
-    logger.log(path);
+    _logger.log(_path);
 
     await createDirs();
 
@@ -42,31 +42,21 @@ class ConfigContoller {
     await createServersDirs(servers);
 
     final downloaders = {
-      ServerType.Paper: PaperDownloader(cacheDir, verbose: verbose),
-      ServerType.Waterfall: WaterfallDownloader(cacheDir, verbose: verbose),
-      ServerType.Forge: ForgeDownloader(cacheDir, verbose: verbose),
+      ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
+      ServerType.Waterfall: WaterfallDownloader(_cacheDir, verbose: verbose),
+      ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
     };
 
     for (final server in servers) {
       await downloaders[server.type]
-          .download(server.version, server.getDir(serversDir));
+          .download(server.version, server.getDir(_serversDir));
     }
-
-    // await paperDownloader.download('1.16.1', outDir);
-    // await paperDownloader.download('1.16.1', outDir);
-    // await paperDownloader.download('1.12.2', outDir);
-    // await waterfallDownloader.download('1.16', outDir);
-    // await waterfallDownloader.download('1.16', outDir);
-    // await waterfallDownloader.download('1.12', outDir);
-    // await forgeDownloader.download('1.16.1', outDir);
-    // await forgeDownloader.download('1.16.1', outDir);
-    // await forgeDownloader.download('1.12.2', outDir);
   }
 
   Future<List<Server>> getServers() async {
     // ignore: omit_local_variable_types
     final List<Server> servers = [];
-    final subFolders = configServersDir.listSync();
+    final subFolders = _configServersDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
       final rawConfig = await file.readAsString();
@@ -86,45 +76,46 @@ class ConfigContoller {
             .toList(),
         restricted: config['restricted'],
         port: config['port'],
+        javaVersion: config['java'],
       );
       servers.add(server);
-      logger.log('Found Server "${server.name}" (ID: ${server.id})');
+      _logger.log('Found Server "${server.name}" (ID: ${server.id})');
     }
     return servers;
   }
 
   void createDirs() async {
-    if (!(await rootDir.exists())) {
-      logger.log('Creating ${rootDir.path}...');
-      await rootDir.create();
+    if (!(await _rootDir.exists())) {
+      _logger.log('Creating ${_rootDir.path}...');
+      await _rootDir.create();
     }
-    if (!(await serversDir.exists())) {
-      logger.log('Creating ${serversDir.path}...');
-      await serversDir.create();
+    if (!(await _serversDir.exists())) {
+      _logger.log('Creating ${_serversDir.path}...');
+      await _serversDir.create();
     }
-    if (!(await cacheDir.exists())) {
-      logger.log('Creating ${cacheDir.path}...');
-      await cacheDir.create();
+    if (!(await _cacheDir.exists())) {
+      _logger.log('Creating ${_cacheDir.path}...');
+      await _cacheDir.create();
     }
-    if (!(await configDir.exists())) {
-      logger.log('Creating ${configDir.path}...');
-      await configDir.create();
+    if (!(await _configDir.exists())) {
+      _logger.log('Creating ${_configDir.path}...');
+      await _configDir.create();
     }
-    if (!(await configServersDir.exists())) {
-      logger.log('Creating ${configServersDir.path}...');
-      await configServersDir.create();
+    if (!(await _configServersDir.exists())) {
+      _logger.log('Creating ${_configServersDir.path}...');
+      await _configServersDir.create();
     }
-    if (!(await configTemplatesDir.exists())) {
-      logger.log('Creating ${configTemplatesDir.path}...');
-      await configTemplatesDir.create();
+    if (!(await _configTemplatesDir.exists())) {
+      _logger.log('Creating ${_configTemplatesDir.path}...');
+      await _configTemplatesDir.create();
     }
   }
 
   void createServersDirs(List<Server> serversList) async {
     for (final server in serversList) {
-      final serverDir = server.getDir(serversDir);
+      final serverDir = server.getDir(_serversDir);
       if (!(await serverDir.exists())) {
-        logger.log('Creating ${serverDir.path}...');
+        _logger.log('Creating ${serverDir.path}...');
         await serverDir.create();
       }
     }

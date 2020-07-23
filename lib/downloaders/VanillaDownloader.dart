@@ -17,7 +17,8 @@ class VanillaDownloader implements ServerDownloader {
 
   VanillaDownloader(this._cacheDir, {this.verbose = false})
       : _logger = Logger(verbose) {
-    _cachedDownloads = _cacheDir.listSync();
+    _cachedDownloads =
+        _cacheDir.listSync().map((file) => File(file.path)).toList();
   }
 
   @override
@@ -26,33 +27,40 @@ class VanillaDownloader implements ServerDownloader {
       _cachedURLs[version] = await getVanillaDownloadURL(version);
     }
 
-    final fileName = 'vanilla-$version.jar';
+    final cacheFileName = 'vanilla-$version.jar';
+    final fileName = 'mojang_$version.jar';
     final url = _cachedURLs[version];
 
-    _logger.log('Downloading $fileName...');
+    _logger.log('Downloading $cacheFileName...');
 
     final cachedDownload = _cachedDownloads.firstWhere(
-        (cachedDownload) => p.basename(cachedDownload.path) == fileName,
+        (cachedDownload) => p.basename(cachedDownload.path) == cacheFileName,
         orElse: () => null);
 
+    final subCacheDir = Directory(p.join(outDir.path, 'cache'));
+    if (!(await subCacheDir.exists())) {
+      _logger.log('Creating ${subCacheDir.path}...');
+      await subCacheDir.create();
+    }
+
     if (cachedDownload != null) {
-      _logger.log('Already downloaded $fileName, using cache');
-      await cachedDownload.copy(p.join(outDir.path, fileName));
+      _logger.log('Already downloaded $cacheFileName, using cache');
+      await cachedDownload.copy(p.join(subCacheDir.path, fileName));
     } else {
       final response = await http.get(url);
-      final cacheFile = await File(p.join(_cacheDir.path, fileName))
+      final cacheFile = await File(p.join(_cacheDir.path, cacheFileName))
           .writeAsBytes(response.bodyBytes);
       _cachedDownloads.add(cacheFile);
-      await cacheFile.copy(p.join(outDir.path, fileName));
+      await cacheFile.copy(p.join(subCacheDir.path, fileName));
     }
-    _logger.log('Done downloading $fileName');
+    _logger.log('Done downloading $cacheFileName');
   }
 
   static Future<String> getVanillaDownloadURL(MCVersion version) async {
     final webScraper = WebScraper('https://mcversions.net');
     await webScraper.loadWebPage('/download/$version');
-    var elements = webScraper.getElement('div.download>a.button', ['href']);
-    final url = elements.first['href'];
+    final elements = webScraper.getElement('div.download>a.button', ['href']);
+    final url = elements.first['attributes']['href'];
     return url;
   }
 }
