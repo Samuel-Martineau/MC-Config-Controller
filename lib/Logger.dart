@@ -1,3 +1,5 @@
+import 'package:colorize/colorize.dart';
+
 class Logger {
   final bool verbose;
 
@@ -5,7 +7,14 @@ class Logger {
 
   void log(String msg) {
     if (verbose) {
-      print(msg);
+      final prefix = Colorize('[VERBOSE]');
+      prefix.green();
+      prefix.bold();
+
+      final message = Colorize(msg);
+      message.white();
+
+      print('$prefix $message');
     }
   }
 }
