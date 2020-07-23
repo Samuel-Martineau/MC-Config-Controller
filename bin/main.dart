@@ -1,18 +1,22 @@
 import 'package:Config_Controller/ConfigController.dart';
+import 'package:Config_Controller/Logger.dart';
 import 'package:args/args.dart';
 
 void main(List<String> arguments) {
   var parser = ArgParser();
   parser.addFlag('verbose', abbr: 'v', defaultsTo: false);
-  parser.addOption('path', abbr: 'p', allowMultiple: false);
+  parser.addFlag('skipInstall', defaultsTo: false);
+  parser.addOption('path', abbr: 'p');
 
-  var parsed = parser.parse(arguments);
+  final parsed = parser.parse(arguments);
+
+  LoggerProvider.init(parsed['verbose']);
 
   if (parsed['path'] == null) {
-    return print('Please specify a folder (config-controller -p <path>)');
+    return LoggerProvider.logger
+        .e('Please specify a folder (config-controller -p <path>)');
   }
 
-  final cfgController =
-      ConfigContoller(parsed['path'], verbose: parsed['verbose']);
-  cfgController.generateConfig();
+  final cfgController = ConfigContoller(parsed['path']);
+  cfgController.generateConfig(!parsed['skipInstall']);
 }

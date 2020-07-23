@@ -1,20 +1,39 @@
-import 'package:colorize/colorize.dart';
+import 'dart:io' as io;
 
-class Logger {
-  final bool verbose;
+import 'package:logger/logger.dart';
 
-  Logger(this.verbose);
+class LoggerProvider {
+  static Logger _logger;
 
-  void log(String msg) {
-    if (verbose) {
-      final prefix = Colorize('[VERBOSE]');
-      prefix.green();
-      prefix.bold();
+  static void init(bool verbose) {
+    _logger = Logger(
+      filter: _CustomFilter(verbose),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 6,
+        colors: io.stdout.supportsAnsiEscapes,
+        lineLength: io.stdout.terminalColumns,
+      ),
+    );
+  }
 
-      final message = Colorize(msg);
-      message.white();
+  static Logger get logger {
+    return _logger;
+  }
+}
 
-      print('$prefix $message');
+class _CustomFilter extends LogFilter {
+  final bool _verbose;
+
+  _CustomFilter(this._verbose);
+
+  @override
+  bool shouldLog(LogEvent event) {
+    switch (event.level) {
+      case Level.verbose:
+        return _verbose;
+      default:
+        return true;
     }
   }
 }

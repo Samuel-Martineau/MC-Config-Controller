@@ -13,7 +13,6 @@ class Server {
   final List<String> extendsTemplates;
   final bool restricted;
   final int port;
-  final int javaVersion;
 
   const Server({
     this.id,
@@ -23,7 +22,6 @@ class Server {
     this.extendsTemplates,
     this.restricted,
     this.port,
-    this.javaVersion,
   });
 
   Directory getDir(Directory serversDir) {
