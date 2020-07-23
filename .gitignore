@@ -10,4 +10,4 @@ doc/api/
 
 # cache
 example-server/cache
-example-server/servers/*
+example-server/servers
