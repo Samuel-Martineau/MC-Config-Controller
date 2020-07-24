@@ -13,14 +13,14 @@ jobs:
         run: pub get
       - name: Build
         run: dart2native bin/main.dart -o config-controller-macos.bin
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: config-controller-macos.bin
-          name: Release v1.0.0
-          tag_name: v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: config-controller-macos.bin
+      #     name: Release v1.0.0
+      #     tag_name: v1.0.0
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 # jobs:
 #   create-release:
 #     name: Create Release
