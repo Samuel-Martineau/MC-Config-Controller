@@ -34,6 +34,8 @@ jobs:
       - run: cat pubspec.yaml
       - name: Install YQ
         run: ${{ matrix.package-manager }} install yq
+      - run: yq r pubspec.yaml version
+      - run: yq -h
       - name: Read version from pubspec.yaml
         id: project_version
         run: echo ::set-env name=VERSION::$(yq r pubspec.yaml version)
