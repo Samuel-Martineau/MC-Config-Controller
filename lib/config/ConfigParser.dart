@@ -1,8 +1,13 @@
 import 'dart:convert';
 
+import 'package:mustache_template/mustache.dart';
 import 'package:yaml/yaml.dart';
 
 class ConfigParser {
+  static String parseVars(String content, Map variables) {
+    return Template(content).renderString(variables);
+  }
+
   static Map<String, dynamic> parseYAML(String content) {
     return loadYaml(content);
   }

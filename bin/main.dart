@@ -3,7 +3,8 @@ import 'package:Config_Controller/Logger.dart';
 import 'package:args/args.dart';
 
 void main(List<String> arguments) {
-  var parser = ArgParser();
+  final parser = ArgParser();
+
   parser.addFlag('verbose', abbr: 'v', defaultsTo: false);
   parser.addFlag('skipInstall', defaultsTo: false);
   parser.addOption('path', abbr: 'p');

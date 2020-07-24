@@ -53,9 +53,8 @@ class SpongeDownloader implements ServerDownloader {
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
         await cacheFile.copy(p.join(modsDir.path, fileName));
-      } catch (e) {
-        final error = e as WebScraperException;
-        _logger.e(error.errorMessage(), 'Could not reach the Sponge website');
+      } on SocketException catch (e) {
+        _logger.e(e.message, 'Could not reach the Sponge website');
         exit(1);
       }
     }
@@ -76,9 +75,8 @@ class SpongeDownloader implements ServerDownloader {
       Match match = regex.firstMatch(links.first['attributes']['href']);
       final build = match.group(1);
       return build;
-    } catch (e) {
-      final error = e as WebScraperException;
-      logger.e(error.errorMessage(), 'Could not reach the Sponge website');
+    } on WebScraperException catch (e) {
+      logger.e(e.errorMessage(), 'Could not reach the Sponge website');
       exit(1);
     }
   }

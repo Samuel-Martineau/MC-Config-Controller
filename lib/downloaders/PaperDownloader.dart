@@ -53,9 +53,8 @@ class PaperDownloader implements ServerDownloader {
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
         await cacheFile.copy(p.join(outDir.path, fileName));
-      } catch (e) {
-        final error = e as SocketException;
-        _logger.e(error.message, 'Could not reach the Paper website');
+      } on SocketException catch (e) {
+        _logger.e(e.message, 'Could not reach the Paper website');
         exit(1);
       }
     }
@@ -71,9 +70,8 @@ class PaperDownloader implements ServerDownloader {
       final response =
           await http.get('https://papermc.io/api/v1/paper/$version/latest');
       return jsonDecode(response.body)['build'];
-    } catch (e) {
-      final error = e as SocketException;
-      logger.e(error.message, 'Could not reach the Paper website');
+    } on SocketException catch (e) {
+      logger.e(e.message, 'Could not reach the Paper website');
       exit(1);
     }
   }

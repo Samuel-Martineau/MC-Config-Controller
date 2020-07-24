@@ -50,9 +50,8 @@ class WaterfallDownloader implements ServerDownloader {
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
         await cacheFile.copy(p.join(outDir.path, fileName));
-      } catch (e) {
-        final error = e as SocketException;
-        _logger.e(error.message, 'Could not reach the Waterfall website');
+      } on SocketException catch (e) {
+        _logger.e(e.message, 'Could not reach the Waterfall website');
         exit(1);
       }
     }
@@ -66,9 +65,8 @@ class WaterfallDownloader implements ServerDownloader {
       final response =
           await http.get('https://papermc.io/api/v1/waterfall/$version/latest');
       return jsonDecode(response.body)['build'];
-    } catch (e) {
-      final error = e as SocketException;
-      logger.e(error.message, 'Could not reach the Waterfall website');
+    } on SocketException catch (e) {
+      logger.e(e.message, 'Could not reach the Waterfall website');
       exit(1);
     }
   }

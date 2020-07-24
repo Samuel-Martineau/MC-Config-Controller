@@ -9,9 +9,8 @@ void createDir(Directory dir) async {
       logger.v('Creating ${dir.path}...');
       await dir.create();
     }
-  } catch (e) {
-    final error = e as FileSystemException;
-    logger.e(error.osError.message, 'Creation of ${dir.path} failed');
+  } on FileSystemException catch (e) {
+    logger.e(e.osError.message, 'Creation of ${dir.path} failed');
     exit(1);
   }
 }

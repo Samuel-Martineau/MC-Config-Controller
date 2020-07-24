@@ -54,9 +54,8 @@ class VanillaDownloader implements ServerDownloader {
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
         await cacheFile.copy(p.join(localCacheDir.path, fileName));
-      } catch (e) {
-        final error = e as WebScraperException;
-        _logger.e(error.errorMessage(), 'Could not reach the Mojang website');
+      } on SocketException catch (e) {
+        _logger.e(e.message, 'Could not reach the Mojang website');
         exit(1);
       }
     }
@@ -72,9 +71,8 @@ class VanillaDownloader implements ServerDownloader {
       final elements = webScraper.getElement('div.download>a.button', ['href']);
       final url = elements.first['attributes']['href'];
       return url;
-    } catch (e) {
-      final error = e as WebScraperException;
-      logger.e(error.errorMessage(), 'Could not reach the MCVersions website');
+    } on WebScraperException catch (e) {
+      logger.e(e.errorMessage(), 'Could not reach the MCVersions website');
       exit(1);
     }
   }

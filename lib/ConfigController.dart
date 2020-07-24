@@ -1,15 +1,16 @@
 import 'dart:io';
 
-import 'package:Config_Controller/ConfigParser.dart';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
+import 'package:Config_Controller/config/ConfigParser.dart';
 import 'package:Config_Controller/downloaders/PaperDownloader.dart';
 import 'package:Config_Controller/downloaders/WaterfallDownloader.dart';
 import 'package:Config_Controller/helpers.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
 
-import 'Server.dart';
+import 'config/Server.dart';
+import 'config/Template.dart';
 import 'downloaders/ForgeDownloader.dart';
 
 class ConfigContoller {
@@ -39,7 +40,10 @@ class ConfigContoller {
 
   void generateConfig(bool install) async {
     await createDirs();
+
     final servers = await getServers();
+    final templates = await getTemplates();
+
     await createServersDirs(servers);
 
     if (install) {
@@ -84,6 +88,27 @@ class ConfigContoller {
       _logger.v('Found Server "${server.name}" (ID: ${server.id})');
     }
     return servers;
+  }
+
+  Future<List<Template>> getTemplates() async {
+// ignore: omit_local_variable_types
+    final List<Template> templates = [];
+    final subFolders = _configTemplatesDir.listSync();
+    for (Directory folder in subFolders) {
+      final file = File(p.join(folder.path, 'config.json'));
+      final rawConfig = await file.readAsString();
+      final config = ConfigParser.parseJSON(rawConfig);
+      final template = Template(
+        id: folder.path.split(Platform.pathSeparator).last,
+        name: config['name'],
+        extendsTemplates: (config['extends'] as List<dynamic>)
+            .map((v) => v.toString())
+            .toList(),
+      );
+      templates.add(template);
+      _logger.v('Found Template "${template.name}" (ID: ${template.id})');
+    }
+    return templates;
   }
 
   void createDirs() async {

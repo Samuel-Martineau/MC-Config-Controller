@@ -58,9 +58,8 @@ class ForgeDownloader implements ServerDownloader {
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
         await cacheFile.copy(p.join(outDir.path, fileName));
-      } catch (e) {
-        final error = e as WebScraperException;
-        _logger.e(error.errorMessage(), 'Could not reach the Forge website');
+      } on SocketException catch (e) {
+        _logger.e(e.message, 'Could not reach the Forge website');
         exit(1);
       }
     }
@@ -81,10 +80,9 @@ class ForgeDownloader implements ServerDownloader {
       final build =
           elements.last['title'].toString().replaceAll(' ', '').split('-')[1];
       return build;
-    } catch (e) {
-      final error = e as WebScraperException;
+    } on WebScraperException catch (e) {
       LoggerProvider.logger
-          .e(error.errorMessage(), 'Could not reach the Forge website');
+          .e(e.errorMessage(), 'Could not reach the Forge website');
       exit(1);
     }
   }
