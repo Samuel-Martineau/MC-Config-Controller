@@ -37,6 +37,7 @@ jobs:
       - name: Read version from pubspec.yaml
         id: project_version
         run: echo ::set-env name=VERSION::$(yq r pubspec.yaml version)
+      - run: echo ${{ env.VERSION }}
       # - name: Create release
       #   id: create_release
       #   uses: actions/create-release@v1
