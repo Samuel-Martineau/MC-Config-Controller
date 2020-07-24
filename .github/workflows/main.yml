@@ -34,15 +34,15 @@ jobs:
         run: ${{ matrix.package-manager }} install yq
       - name: Read version from pubspec.yaml
         id: project_version
-        run: echo "$(yq r pubspec.yaml version)"
+        run: echo ::set-env name=VERSION::$(yq r pubspec.yaml version)
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.project_version.outputs.value }}
-          release_name: Release ${{ steps.project_version.outputs.value }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           body: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
