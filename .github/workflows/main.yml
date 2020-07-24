@@ -18,9 +18,11 @@ jobs:
           body: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
+      - run: echo ::set-env name=UPLOAD_URL::${{ steps.create_release.outputs.upload_url }}
   build:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    needs: [create-release]
 
     strategy:
       fail-fast: true
@@ -53,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ jobs.create-release.steps.create_release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: ./main
           asset_name: config-controller-${{ matrix.os }}
           asset_content_type: application/x-binary
