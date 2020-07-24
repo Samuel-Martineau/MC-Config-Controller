@@ -7,6 +7,7 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Install YQ
         run: sudo snap install yq
       - name: Read version from pubspec.yaml
