@@ -30,16 +30,12 @@ jobs:
       #   run: pub get
       # - name: Build
       #   run: dart2native bin/main.dart -o main
-      - run: ls
-      - run: cat pubspec.yaml
       - name: Install YQ
         run: ${{ matrix.package-manager }} install yq
-      - run: yq r pubspec.yaml version
-      - run: yq -h
       - name: Read version from pubspec.yaml
         id: project_version
-        run: echo ::set-env name=VERSION::$(yq r pubspec.yaml version)
-      - run: echo ${{ env.VERSION }}
+        run: echo ::set-output name=VERSION::$(yq r pubspec.yaml version)
+      - run: echo ${{ steps.project_version.outputs.VERSION }}
       # - name: Create release
       #   id: create_release
       #   uses: actions/create-release@v1
