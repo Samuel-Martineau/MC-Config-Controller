@@ -4,7 +4,7 @@ on: push
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install Dart
@@ -12,11 +12,11 @@ jobs:
       - name: Install dependencies
         run: pub get
       - name: Build
-        run: dart2native bin/main.dart -o config-controller-linux.bin
+        run: dart2native bin/main.dart -o config-controller-macos.bin
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: config-controller-linux.bin
+          files: config-controller-macos.bin
           name: Release v1.0.0
           tag_name: v1.0.0
         env:
@@ -74,8 +74,11 @@ jobs:
 #       - name: Build
 #         run: dart2native bin/main.dart -o ${{ matrix.output-file }}
 #       - name: Upload binary to release
-
-#         # id: upload-release-asset
+#         id: upload-release-asset
+#         uses: AButler/upload-release-assets@v2.0
+#         with:
+#           files: ${{ matrix.output-file }}
+#           repo-token: ${{ secrets.GITHUB_TOKEN }}
 #         # uses: actions/upload-release-asset@v1
 #         # env:
 #         #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
