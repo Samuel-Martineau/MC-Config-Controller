@@ -46,6 +46,10 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
+    servers.forEach((element) {
+      print(element.getFlattenExtendsTree(templates));
+    });
+
     if (install) {
       final downloaders = {
         ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
@@ -66,47 +70,55 @@ class ConfigContoller {
     final subFolders = _configServersDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
-      final rawConfig = await file.readAsString();
-      final config = ConfigParser.parseJSON(rawConfig);
-      final possibleTypes = {
-        'paper': ServerType.Paper,
-        'waterfall': ServerType.Waterfall,
-        'forge': ServerType.Forge
-      };
-      final server = Server(
-        id: folder.path.split(Platform.pathSeparator).last,
-        name: config['name'],
-        type: possibleTypes[config['type']],
-        version: MCVersion(config['version']),
-        extendsTemplates: (config['extends'] as List<dynamic>)
-            .map((v) => v.toString())
-            .toList(),
-        restricted: config['restricted'],
-        port: config['port'],
-      );
-      servers.add(server);
-      _logger.v('Found Server "${server.name}" (ID: ${server.id})');
+      if ((await file.exists())) {
+        final rawConfig = await file.readAsString();
+        final config = ConfigParser.parseJSON(rawConfig);
+        final possibleTypes = {
+          'paper': ServerType.Paper,
+          'waterfall': ServerType.Waterfall,
+          'forge': ServerType.Forge
+        };
+        final server = Server(
+          id: folder.path.split(Platform.pathSeparator).last,
+          name: config['name'],
+          type: possibleTypes[config['type']],
+          version: MCVersion(config['version']),
+          extendsTemplates: (config['extends'] as List<dynamic>)
+              .map((v) => v.toString())
+              .toList(),
+          restricted: config['restricted'],
+          port: config['port'],
+        );
+        servers.add(server);
+        _logger.v('Found $server');
+      } else {
+        _logger.w('No config file found in ${folder.path}');
+      }
     }
     return servers;
   }
 
   Future<List<Template>> getTemplates() async {
-// ignore: omit_local_variable_types
+    // ignore: omit_local_variable_types
     final List<Template> templates = [];
     final subFolders = _configTemplatesDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
-      final rawConfig = await file.readAsString();
-      final config = ConfigParser.parseJSON(rawConfig);
-      final template = Template(
-        id: folder.path.split(Platform.pathSeparator).last,
-        name: config['name'],
-        extendsTemplates: (config['extends'] as List<dynamic>)
-            .map((v) => v.toString())
-            .toList(),
-      );
-      templates.add(template);
-      _logger.v('Found Template "${template.name}" (ID: ${template.id})');
+      if ((await file.exists())) {
+        final rawConfig = await file.readAsString();
+        final config = ConfigParser.parseJSON(rawConfig);
+        final template = Template(
+          id: folder.path.split(Platform.pathSeparator).last,
+          name: config['name'],
+          extendsTemplates: (config['extends'] as List<dynamic>)
+              .map((v) => v.toString())
+              .toList(),
+        );
+        templates.add(template);
+        _logger.v('Found $template');
+      } else {
+        _logger.w('No config file found in ${folder.path}');
+      }
     }
     return templates;
   }

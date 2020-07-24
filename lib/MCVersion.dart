@@ -10,22 +10,6 @@ class MCVersion {
     if (splitted.length == 3) patch = int.parse(splitted[2]);
   }
 
-  bool isGreaterThan(MCVersion toCompare) {
-    return (major > toCompare.major) ||
-        (major == toCompare.major && minor > toCompare.minor) ||
-        (major == toCompare.major &&
-            minor == toCompare.minor &&
-            patch > toCompare.patch);
-  }
-
-  bool isSmallerThan(MCVersion toCompare) {
-    return (major < toCompare.major) ||
-        (major == toCompare.major && minor < toCompare.minor) ||
-        (major == toCompare.major &&
-            minor == toCompare.minor &&
-            patch < toCompare.patch);
-  }
-
   @override
   String toString() {
     return '$major.$minor' + (patch != null ? '.$patch' : '');
@@ -33,6 +17,18 @@ class MCVersion {
 
   @override
   bool operator ==(other) {
-    return toString() == other.toString();
+    return other is MCVersion && toString() == other.toString();
   }
+
+  // @override
+  // bool operator >(MCVersion other) {}
+
+  // @override
+  // bool operator <(MCVersion other) {}
+
+  // @override
+  // bool operator >=(MCVersion other) {}
+
+  // @override
+  // bool operator <=(MCVersion other) {}
 }

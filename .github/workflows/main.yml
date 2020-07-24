@@ -6,6 +6,8 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - uses: actions/checkout@v2
       - name: Install YQ
@@ -24,16 +26,22 @@ jobs:
           body: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
-      - run: echo ::set-env name=UPLOAD_URL::${{ steps.create_release.outputs.upload_url }}
   build:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: [create-release]
+    needs: create-release
 
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        includes:
+          - os: ubuntu-latest
+            os-display-name: linux
+          - os: macOS-latest
+            os-display-name: macOS
+          - os: windows-latest
+            os-display-name: windows
 
     steps:
       - uses: actions/checkout@v2
@@ -49,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ env.UPLOAD_URL }}
+          upload_url: ${{ needs.create-release.outputs.UPLOAD_URL }}
           asset_path: ./main
-          asset_name: config-controller-${{ matrix.os }}
+          asset_name: config-controller-${{ matrix.os-display-name }}
           asset_content_type: application/x-binary

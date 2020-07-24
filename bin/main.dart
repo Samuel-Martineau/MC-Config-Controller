@@ -6,7 +6,7 @@ void main(List<String> arguments) {
   final parser = ArgParser();
 
   parser.addFlag('verbose', abbr: 'v', defaultsTo: false);
-  parser.addFlag('skipInstall', defaultsTo: false);
+  parser.addFlag('install', abbr: 'i', defaultsTo: false);
   parser.addOption('path', abbr: 'p');
 
   final parsed = parser.parse(arguments);
@@ -19,5 +19,5 @@ void main(List<String> arguments) {
   }
 
   final cfgController = ConfigContoller(parsed['path']);
-  cfgController.generateConfig(!parsed['skipInstall']);
+  cfgController.generateConfig(parsed['install']);
 }

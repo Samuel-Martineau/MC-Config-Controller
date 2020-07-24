@@ -81,8 +81,7 @@ class ForgeDownloader implements ServerDownloader {
           elements.last['title'].toString().replaceAll(' ', '').split('-')[1];
       return build;
     } on WebScraperException catch (e) {
-      LoggerProvider.logger
-          .e(e.errorMessage(), 'Could not reach the Forge website');
+      logger.e(e.errorMessage(), 'Could not reach the Forge website');
       exit(1);
     }
   }
