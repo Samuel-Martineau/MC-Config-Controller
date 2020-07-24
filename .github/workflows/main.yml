@@ -35,7 +35,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        includes:
+        include:
           - os: ubuntu-latest
             os-display-name: linux
           - os: macOS-latest
