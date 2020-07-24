@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Dart
-        uses: DanTup/gh-actions/setup-dart@0.0.7
+        uses: DanTup/gh-actions/setup-dart@v0.0.7
       - name: Install dependencies
         run: pub get
       - name: Build
