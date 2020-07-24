@@ -4,6 +4,5 @@
   "version": "1.15",
   "extends": [],
   "variables": {},
-  "port": 25565,
-  "java": 11
+  "port": 25565
 }
