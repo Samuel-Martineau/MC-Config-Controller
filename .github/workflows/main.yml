@@ -58,8 +58,8 @@ jobs:
         uses: skx/github-action-publish-binaries@release-1.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASEID: ${{ needs.create-release.outputs.id }}
         with:
-          releaseId: ${{ needs.create-release.outputs.id }}
           args: '${{ matrix.output-file }}'
       # - name: Zip file
       #   uses: thedoctor0/zip-release@master
