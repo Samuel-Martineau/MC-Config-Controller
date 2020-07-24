@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            package-manager: snap
+            package-manager: sudo snap
           - os: macOS-latest
             package-manager: brew
           - os: windows-latest
@@ -34,7 +34,7 @@ jobs:
         run: ${{ matrix.package-manager }} install yq
       - name: Read version from pubspec.yaml
         id: project_version
-        run: yq r pubspec.yaml version
+        run: echo "$(yq r pubspec.yaml version)"
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
