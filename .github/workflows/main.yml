@@ -3,8 +3,23 @@ name: Build & Release
 on: push
 
 jobs:
-  build-and-release:
-    name: Build & Release for ${{ matrix.os }}
+  create-release:
+    name: Create Release for ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.project_version.outputs.VERSION }}
+          release_name: Release ${{ steps.project_version.outputs.VERSION }}
+          body: ${{ github.event.head_commit.message }}
+          draft: false
+          prerelease: false
+  build:
+    name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -32,24 +47,13 @@ jobs:
       - name: Read version from pubspec.yaml
         id: project_version
         run: echo ::set-output name=VERSION::$(yq r pubspec.yaml version)
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.project_version.outputs.VERSION }}
-          release_name: Release ${{ steps.project_version.outputs.VERSION }}
-          body: ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: false
       - name: Upload binary to release
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ jobs.create-release.steps.create_release.outputs.upload_url }}
           asset_path: ./main
           asset_name: config-controller-${{ matrix.os }}
           asset_content_type: application/x-binary
