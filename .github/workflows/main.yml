@@ -13,7 +13,6 @@ jobs:
         run: pub get
       - name: Build
         run: dart2native bin/main.dart -o config-controller-linux.bin
-      - name: Upload binary to release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
