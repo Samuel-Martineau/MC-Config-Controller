@@ -27,7 +27,7 @@ jobs:
           draft: false
           prerelease: false
   build:
-    name: Build for ${{ matrix.os }}
+    name: Build for  ${{ matrix.os-display-name }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -54,7 +54,7 @@ jobs:
           name: config-controller-${{ matrix.os-display-name }}
           path: config-controller-${{ matrix.os-display-name }}
   create-release-assets:
-    name: Create Release Assets
+    name: Create Release Assets for ${{ matrix.os-display-name }}
     runs-on: ubuntu-latest
     needs: [create-release, build]
 
