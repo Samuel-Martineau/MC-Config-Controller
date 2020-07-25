@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: pub get
       - name: Generate environment config
-        run: pub run environment_config:generate --version=${{ needs.create-release.outputs.VERSION }}
+        run: pub run environment_config:generate --build_version=${{ needs.create-release.outputs.VERSION }}
       - name: Build
         run: dart2native bin/main.dart -o ${{ matrix.output-file }}
       - uses: actions/upload-artifact@v2
