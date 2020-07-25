@@ -1,0 +1,6 @@
+environment_config:
+  class: EnvironmentConfig
+
+  fields:
+    build_version:
+      default: 'UNKNOWN'

@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+      VERSION: ${{ steps.project_version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
       - name: Install YQ
@@ -29,6 +30,7 @@ jobs:
   build:
     name: Build for  ${{ matrix.os-display-name }}
     runs-on: ${{ matrix.os }}
+    needs: create-release
 
     strategy:
       fail-fast: true
@@ -50,6 +52,8 @@ jobs:
         uses: DanTup/gh-actions/setup-dart@v0.0.7
       - name: Install dependencies
         run: pub get
+      - name: Generate environment config
+        run: pub run environment_config:generate --version=${{ needs.create-release.outputs.VERSION }}
       - name: Build
         run: dart2native bin/main.dart -o ${{ matrix.output-file }}
       - uses: actions/upload-artifact@v2

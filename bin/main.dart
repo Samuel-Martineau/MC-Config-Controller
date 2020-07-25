@@ -1,8 +1,9 @@
 import 'package:Config_Controller/ConfigController.dart';
 import 'package:Config_Controller/Logger.dart';
+import 'package:Config_Controller/UpdateManager.dart';
 import 'package:args/args.dart';
 
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
   final parser = ArgParser();
 
   parser.addFlag('verbose', abbr: 'v', defaultsTo: false);
@@ -20,4 +21,6 @@ void main(List<String> arguments) {
 
   final cfgController = ConfigContoller(parsed['path']);
   cfgController.generateConfig(parsed['install']);
+
+  await UpdateManager.printUpdateMessage();
 }
