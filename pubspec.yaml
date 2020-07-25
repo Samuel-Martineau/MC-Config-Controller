@@ -1,6 +1,6 @@
 name: Config_Controller
 description: A simple command-line application.
-version: 0.0.0-alpha
+version: 0.0.1-alpha
 homepage: https://github.com/Samuel-Martineau/MC-Config-Controller
 
 environment:
