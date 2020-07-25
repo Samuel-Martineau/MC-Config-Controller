@@ -37,10 +37,13 @@ jobs:
         include:
           - os: ubuntu-latest
             os-display-name: linux
+            output-file: config-controller-${{ matrix.os-display-name }}
           - os: macOS-latest
             os-display-name: macos
+            output-file: config-controller-${{ matrix.os-display-name }}
           - os: windows-latest
             os-display-name: windows
+            output-file: config-controller-${{ matrix.os-display-name }}.exe
     steps:
       - uses: actions/checkout@v2
       - name: Install Dart
@@ -48,11 +51,11 @@ jobs:
       - name: Install dependencies
         run: pub get
       - name: Build
-        run: dart2native bin/main.dart -o config-controller-${{ matrix.os-display-name }}
+        run: dart2native bin/main.dart -o ${{ matrix.output-file }}
       - uses: actions/upload-artifact@v2
         with:
-          name: config-controller-${{ matrix.os-display-name }}
-          path: config-controller-${{ matrix.os-display-name }}
+          name: ${{ matrix.output-file }}
+          path: ${{ matrix.output-file }}
   create-release-assets:
     name: Create Release Assets for ${{ matrix.os-display-name }}
     runs-on: ubuntu-latest
@@ -65,27 +68,30 @@ jobs:
         include:
           - os: ubuntu-latest
             os-display-name: linux
+            output-file: config-controller-${{ matrix.os-display-name }}
           - os: macOS-latest
             os-display-name: macos
+            output-file: config-controller-${{ matrix.os-display-name }}
           - os: windows-latest
             os-display-name: windows
+            output-file: config-controller-${{ matrix.os-display-name }}.exe
 
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: config-controller-${{ matrix.os-display-name }}
+          name: ${{ matrix.output-file }}
       - uses: geekyeggo/delete-artifact@v1
         with:
-          name: config-controller-${{ matrix.os-display-name }}
-      - run: chmod +x config-controller-${{ matrix.os-display-name }}
+          name: ${{ matrix.output-file }}
+      - run: chmod +x ${{ matrix.output-file }}
         if: ${{ matrix.os-display-name == 'linux' || matrix.os-display-name == 'macos' }}
-      - run: zip config-controller-${{ matrix.os-display-name }}.zip config-controller-${{ matrix.os-display-name }}
+      - run: zip ${{ matrix.os-display-name }}.zip ${{ matrix.output-file }}
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.UPLOAD_URL }}
-          asset_path: config-controller-${{ matrix.os-display-name }}.zip
-          asset_name: config-controller-${{ matrix.os-display-name }}.zip
+          asset_path: ${{ matrix.os-display-name }}.zip
+          asset_name: ${{ matrix.os-display-name }}.zip
           asset_content_type: application/zip
