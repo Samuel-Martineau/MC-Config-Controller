@@ -15,7 +15,8 @@ class Template {
   });
 
   Directory getConfigDir(Directory configDir) {
-    return Directory(p.join(configDir.path, id));
+    return Directory(
+        p.join(configDir.path, runtimeType.toString().toLowerCase() + 's', id));
   }
 
   List<Template> getFlattenExtendsTree(

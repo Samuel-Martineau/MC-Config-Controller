@@ -21,8 +21,8 @@ class ConfigContoller {
   Directory _serversDir;
   Directory _cacheDir;
   Directory _configDir;
-  Directory _configServersDir;
-  Directory _configTemplatesDir;
+  Directory _serversConfigDir;
+  Directory _templatesConfigDir;
 
   Logger _logger;
 
@@ -31,8 +31,8 @@ class ConfigContoller {
     _serversDir = Directory(p.join(_rootDir.path, 'servers'));
     _cacheDir = Directory(p.join(_rootDir.path, 'cache'));
     _configDir = Directory(p.join(_rootDir.path, 'config'));
-    _configServersDir = Directory(p.join(_rootDir.path, 'config', 'servers'));
-    _configTemplatesDir =
+    _serversConfigDir = Directory(p.join(_rootDir.path, 'config', 'servers'));
+    _templatesConfigDir =
         Directory(p.join(_rootDir.path, 'config', 'templates'));
 
     _logger = LoggerProvider.logger;
@@ -46,18 +46,25 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
-    servers.forEach((element) {
-      print(element.getFlattenExtendsTree(templates));
-    });
-
-    if (install) {
-      final downloaders = {
-        ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
-        ServerType.Waterfall: WaterfallDownloader(_cacheDir, verbose: verbose),
-        ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
-      };
-
-      for (final server in servers) {
+    for (final server in servers) {
+      for (final template in server.getFlattenExtendsTree(templates)) {
+        template
+            .getConfigDir(_configDir)
+            .listSync(recursive: true)
+            .forEach((fileSystemEntity) {
+          if (fileSystemEntity is File) {
+            // final relFile
+            // mergeFiles(fileSystemEntity, server.ge);
+          }
+        });
+      }
+      if (install) {
+        final downloaders = {
+          ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
+          ServerType.Waterfall:
+              WaterfallDownloader(_cacheDir, verbose: verbose),
+          ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
+        };
         await downloaders[server.type]
             .download(server.version, server.getDir(_serversDir));
       }
@@ -67,7 +74,7 @@ class ConfigContoller {
   Future<List<Server>> getServers() async {
     // ignore: omit_local_variable_types
     final List<Server> servers = [];
-    final subFolders = _configServersDir.listSync();
+    final subFolders = _serversConfigDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
       if ((await file.exists())) {
@@ -101,7 +108,7 @@ class ConfigContoller {
   Future<List<Template>> getTemplates() async {
     // ignore: omit_local_variable_types
     final List<Template> templates = [];
-    final subFolders = _configTemplatesDir.listSync();
+    final subFolders = _templatesConfigDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
       if ((await file.exists())) {
@@ -128,8 +135,8 @@ class ConfigContoller {
     await createDir(_serversDir);
     await createDir(_cacheDir);
     await createDir(_configDir);
-    await createDir(_configServersDir);
-    await createDir(_configTemplatesDir);
+    await createDir(_serversConfigDir);
+    await createDir(_templatesConfigDir);
   }
 
   void createServersDirs(List<Server> serversList) async {
