@@ -37,13 +37,13 @@ jobs:
         include:
           - os: ubuntu-latest
             os-display-name: linux
-            output-file: config-controller-${{ matrix.os-display-name }}
+            output-file: config-controller-linux
           - os: macOS-latest
             os-display-name: macos
-            output-file: config-controller-${{ matrix.os-display-name }}
+            output-file: config-controller-macos
           - os: windows-latest
             os-display-name: windows
-            output-file: config-controller-${{ matrix.os-display-name }}.exe
+            output-file: config-controller-windows.exe
     steps:
       - uses: actions/checkout@v2
       - name: Install Dart
@@ -68,13 +68,13 @@ jobs:
         include:
           - os: ubuntu-latest
             os-display-name: linux
-            output-file: config-controller-${{ matrix.os-display-name }}
+            output-file: config-controller-linux
           - os: macOS-latest
             os-display-name: macos
-            output-file: config-controller-${{ matrix.os-display-name }}
+            output-file: config-controller-macos
           - os: windows-latest
             os-display-name: windows
-            output-file: config-controller-${{ matrix.os-display-name }}.exe
+            output-file: config-controller-windows
 
     steps:
       - uses: actions/checkout@v2
