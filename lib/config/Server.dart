@@ -9,8 +9,7 @@ enum ServerType { Paper, Waterfall, Forge }
 class Server extends Template {
   final ServerType type;
   final MCVersion version;
-  final bool restricted;
-  final int port;
+  final Map variables;
 
   const Server({
     String id,
@@ -18,8 +17,7 @@ class Server extends Template {
     this.type,
     this.version,
     List<String> extendsTemplates,
-    this.restricted,
-    this.port,
+    this.variables,
   }) : super(id: id, name: name, extendsTemplates: extendsTemplates);
 
   Directory getDir(Directory serversDir) {
@@ -27,14 +25,18 @@ class Server extends Template {
   }
 
   Map toMap() {
+    final possibleTypes = {
+      ServerType.Paper: 'paper',
+      ServerType.Waterfall: 'waterfall',
+      ServerType.Forge: 'forge'
+    };
     final map = {
       'id': id,
       'name': name,
-      'type': type,
+      'type': possibleTypes[type],
       'version': version.toString(),
       'extends': extendsTemplates,
-      'restricted': restricted,
-      'port': port
+      'variables': variables
     };
     return map;
   }

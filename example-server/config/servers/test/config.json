@@ -5,6 +5,6 @@
   "extends": ["Base Server"],
   "variables": {
     "restricted": false,
-    "port": 25566
+    "port": 25567
   }
 }

@@ -1,11 +1,16 @@
 import 'dart:convert';
 
-import 'package:mustache_template/mustache.dart';
+import 'package:liquid_engine/liquid_engine.dart' as liquid_engine;
 import 'package:yaml/yaml.dart';
 
 class ConfigParser {
   static String parseVars(String content, Map variables) {
-    return Template(content).renderString(variables);
+    final context = liquid_engine.Context.create();
+    context.variables = variables;
+    final template = liquid_engine.Template.parse(
+        context, liquid_engine.Source.fromString(content));
+    return template.render(context);
+    // return Template(content).renderString(variables);
   }
 
   static Map<dynamic, dynamic> parseYAML(String content) {

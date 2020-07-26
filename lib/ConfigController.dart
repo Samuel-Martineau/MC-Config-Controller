@@ -45,7 +45,10 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
+    await clearOldConfigFiles();
+
     final globalVars = await globalVariables;
+    final serverMaps = servers.map((s) => s.toMap()).toList();
 
     for (final server in servers) {
       for (final template in server.getFlattenExtendsTree(templates)) {
@@ -61,7 +64,11 @@ class ConfigContoller {
               final srcPath = fileSystemEntity.path;
               final distPath = p.join(server.getDir(_serversDir).path, relPath);
 
-              final vars = {...globalVars, ...server.toMap()};
+              final vars = {
+                'global': globalVars,
+                'servers': serverMaps,
+                'server': server.toMap()
+              };
 
               mergeConfigFiles(File(srcPath), File(distPath), vars);
             }
@@ -103,8 +110,7 @@ class ConfigContoller {
           extendsTemplates: (config['extends'] as List<dynamic>)
               .map((v) => v.toString())
               .toList(),
-          restricted: config['restricted'],
-          port: config['port'],
+          variables: config['variables'],
         );
         servers.add(server);
         _logger.v('Found $server');
@@ -162,5 +168,17 @@ class ConfigContoller {
     final globalVarsFile = File(p.join(_configDir.path, 'variables.json'));
     await createFile(globalVarsFile, defaultContent: '{}');
     return ConfigParser.parseJSON(await globalVarsFile.readAsString());
+  }
+
+  void clearOldConfigFiles() async {
+    final configFiles = _serversDir.listSync(recursive: true);
+    for (FileSystemEntity configFile in configFiles) {
+      if (configFile is File) {
+        final ext = p.extension(configFile.path);
+        if (ext != '.jar') {
+          await configFile.delete();
+        }
+      }
+    }
   }
 }

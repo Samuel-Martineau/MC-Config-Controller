@@ -45,10 +45,20 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
 
   await Future.wait([createFile(srcFile), createFile(targetFile)]);
 
-  final srcFileContent =
+  String srcFileContent;
+  String targetFileContent;
+
+  // try {
+  srcFileContent =
       ConfigParser.parseVars(await srcFile.readAsString(), variables);
-  final targetFileContent =
+  targetFileContent =
       ConfigParser.parseVars(await targetFile.readAsString(), variables);
+  // } on catch (e) {
+  //   logger.e(e,
+  //       'Bad template in either file ${srcFile.path} or file ${targetFile.path}');
+  //   exit(1);
+  // }
+
   String toWrite;
 
   if (targetFileContent != '') {
