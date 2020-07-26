@@ -51,10 +51,14 @@ class ConfigContoller {
         template
             .getConfigDir(_configDir)
             .listSync(recursive: true)
-            .forEach((fileSystemEntity) {
-          if (fileSystemEntity is File) {
-            // final relFile
-            // mergeFiles(fileSystemEntity, server.ge);
+            .forEach((templateFileSystemEntity) {
+          if (templateFileSystemEntity is File) {
+            final regex = RegExp(r'/^(templates|servers)/(.+?)//');
+            final relPath = templateFileSystemEntity.path.replaceAll(regex, '');
+            // print(relPath);
+            // regex.firstMatch(templateFileSystemEntity);
+            mergeFiles(templateFileSystemEntity);
+            //print(templateFileSystemEntity);
           }
         });
       }
@@ -143,6 +147,52 @@ class ConfigContoller {
     for (final server in serversList) {
       final serverDir = server.getDir(_serversDir);
       await createDir(serverDir);
+    }
+  }
+
+  void mergeFiles(File configFile) async {
+    final rawConfig = await configFile.readAsString();
+    // final serverConfig = ConfigParser.parseJSON(rawConfig);
+    final ext = p.extension(configFile.path);
+    print(ext);
+    // print(serverConfig);
+    switch (ext) {
+      case '.yaml':
+      case '.yml':
+        print('yaml');
+        // final oldContent = ConfigParser.parseYAML(templateRawConfig);
+        // final newContent = ConfigParser.parseYAML(newRawConfig);
+        // print(oldContent);
+        // print(newContent);
+        //     oldContent = YAML.parse(fs.readFileSync(serverP).toString());
+        //     newContent = YAML.parse(newContent);
+        //     toWrite = YAML.stringify({ ...oldContent, ...newContent });
+        break;
+      case '.json':
+        print('json');
+        final oldContent = ConfigParser.parseJSON(rawConfig);
+        // final newContent = ConfigParser.parseJSON(rawConfig);
+        print(oldContent);
+        // print(newContent);
+        //     oldContent = JSON.parse(fs.readFileSync(serverP));
+        //     newContent = JSON.parse(newContent);
+        //     toWrite = JSON.stringify({ ...oldContent, ...newContent });
+        break;
+      case '.properties':
+        print('properties');
+        // final oldContent = ConfigParser.parseProperties(templateRawConfig);
+        // final newContent = ConfigParser.parseProperties(newRawConfig);
+        // print(oldContent);
+        // print(newContent);
+        //     oldContent = PROPERTIES.parse(
+        //       fs.readFileSync(serverP).toString(),
+        //     );
+        //     newContent = PROPERTIES.parse(newContent);
+        //     toWrite = JSON.stringify({ ...oldContent, ...newContent });
+        break;
+      default:
+        _logger.w("${ext} isn't supported, overwriting...");
+        break;
     }
   }
 }
