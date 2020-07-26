@@ -25,4 +25,17 @@ class Server extends Template {
   Directory getDir(Directory serversDir) {
     return Directory(p.join(serversDir.path, id));
   }
+
+  Map toMap() {
+    final map = {
+      'id': id,
+      'name': name,
+      'type': type,
+      'version': version.toString(),
+      'extends': extendsTemplates,
+      'restricted': restricted,
+      'port': port
+    };
+    return map;
+  }
 }

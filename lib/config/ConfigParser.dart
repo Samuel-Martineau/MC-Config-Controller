@@ -8,15 +8,15 @@ class ConfigParser {
     return Template(content).renderString(variables);
   }
 
-  static Map<String, dynamic> parseYAML(String content) {
+  static Map<dynamic, dynamic> parseYAML(String content) {
     return loadYaml(content);
   }
 
-  static Map<String, dynamic> parseJSON(String content) {
+  static Map<dynamic, dynamic> parseJSON(String content) {
     return jsonDecode(content);
   }
 
-  static Map<String, dynamic> parseProperties(String content) {
+  static Map<dynamic, dynamic> parseProperties(String content) {
     final regex = RegExp(r'^([\w-.]+) ?= ?(.*)$');
     final object = {};
     content

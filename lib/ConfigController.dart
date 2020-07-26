@@ -31,9 +31,8 @@ class ConfigContoller {
     _serversDir = Directory(p.join(_rootDir.path, 'servers'));
     _cacheDir = Directory(p.join(_rootDir.path, 'cache'));
     _configDir = Directory(p.join(_rootDir.path, 'config'));
-    _serversConfigDir = Directory(p.join(_rootDir.path, 'config', 'servers'));
-    _templatesConfigDir =
-        Directory(p.join(_rootDir.path, 'config', 'templates'));
+    _serversConfigDir = Directory(p.join(_configDir.path, 'servers'));
+    _templatesConfigDir = Directory(p.join(_configDir.path, 'templates'));
 
     _logger = LoggerProvider.logger;
   }
@@ -46,19 +45,26 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
+    final globalVars = await globalVariables;
+
     for (final server in servers) {
       for (final template in server.getFlattenExtendsTree(templates)) {
         template
             .getConfigDir(_configDir)
             .listSync(recursive: true)
-            .forEach((templateFileSystemEntity) {
-          if (templateFileSystemEntity is File) {
-            final regex = RegExp(r'/^(templates|servers)/(.+?)//');
-            final relPath = templateFileSystemEntity.path.replaceAll(regex, '');
-            // print(relPath);
-            // regex.firstMatch(templateFileSystemEntity);
-            mergeFiles(templateFileSystemEntity);
-            //print(templateFileSystemEntity);
+            .forEach((fileSystemEntity) {
+          if (fileSystemEntity is File) {
+            final relPath = fileSystemEntity.path.replaceFirst(
+                '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
+                '');
+            if (relPath != 'config.json') {
+              final srcPath = fileSystemEntity.path;
+              final distPath = p.join(server.getDir(_serversDir).path, relPath);
+
+              final vars = {...globalVars, ...server.toMap()};
+
+              mergeConfigFiles(File(srcPath), File(distPath), vars);
+            }
           }
         });
       }
@@ -135,12 +141,14 @@ class ConfigContoller {
   }
 
   void createDirs() async {
-    await createDir(_rootDir);
-    await createDir(_serversDir);
-    await createDir(_cacheDir);
-    await createDir(_configDir);
-    await createDir(_serversConfigDir);
-    await createDir(_templatesConfigDir);
+    await Future.wait([
+      createDir(_rootDir),
+      createDir(_serversDir),
+      createDir(_cacheDir),
+      createDir(_configDir),
+      createDir(_serversConfigDir),
+      createDir(_templatesConfigDir)
+    ]);
   }
 
   void createServersDirs(List<Server> serversList) async {
@@ -150,49 +158,9 @@ class ConfigContoller {
     }
   }
 
-  void mergeFiles(File configFile) async {
-    final rawConfig = await configFile.readAsString();
-    // final serverConfig = ConfigParser.parseJSON(rawConfig);
-    final ext = p.extension(configFile.path);
-    print(ext);
-    // print(serverConfig);
-    switch (ext) {
-      case '.yaml':
-      case '.yml':
-        print('yaml');
-        // final oldContent = ConfigParser.parseYAML(templateRawConfig);
-        // final newContent = ConfigParser.parseYAML(newRawConfig);
-        // print(oldContent);
-        // print(newContent);
-        //     oldContent = YAML.parse(fs.readFileSync(serverP).toString());
-        //     newContent = YAML.parse(newContent);
-        //     toWrite = YAML.stringify({ ...oldContent, ...newContent });
-        break;
-      case '.json':
-        print('json');
-        final oldContent = ConfigParser.parseJSON(rawConfig);
-        // final newContent = ConfigParser.parseJSON(rawConfig);
-        print(oldContent);
-        // print(newContent);
-        //     oldContent = JSON.parse(fs.readFileSync(serverP));
-        //     newContent = JSON.parse(newContent);
-        //     toWrite = JSON.stringify({ ...oldContent, ...newContent });
-        break;
-      case '.properties':
-        print('properties');
-        // final oldContent = ConfigParser.parseProperties(templateRawConfig);
-        // final newContent = ConfigParser.parseProperties(newRawConfig);
-        // print(oldContent);
-        // print(newContent);
-        //     oldContent = PROPERTIES.parse(
-        //       fs.readFileSync(serverP).toString(),
-        //     );
-        //     newContent = PROPERTIES.parse(newContent);
-        //     toWrite = JSON.stringify({ ...oldContent, ...newContent });
-        break;
-      default:
-        _logger.w("${ext} isn't supported, overwriting...");
-        break;
-    }
+  Future<Map> get globalVariables async {
+    final globalVarsFile = File(p.join(_configDir.path, 'variables.json'));
+    await createFile(globalVarsFile, defaultContent: '{}');
+    return ConfigParser.parseJSON(await globalVarsFile.readAsString());
   }
 }

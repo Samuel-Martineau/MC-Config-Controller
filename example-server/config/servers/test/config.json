@@ -3,6 +3,8 @@
   "type": "forge",
   "version": "1.12.2",
   "extends": ["Base Server"],
-  "restricted": false,
-  "port": 25566
+  "variables": {
+    "restricted": false,
+    "port": 25566
+  }
 }

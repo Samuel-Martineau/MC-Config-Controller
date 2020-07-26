@@ -3,6 +3,7 @@
   "type": "waterfall",
   "version": "1.15",
   "extends": [],
-  "variables": {},
-  "port": 25565
+  "variables": {
+    "port": 25565
+  }
 }

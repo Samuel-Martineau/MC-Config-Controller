@@ -12,4 +12,10 @@ servers:
     motd: ''
     address: localhost:25567
     restricted: true
+  {{#servers}}
+  {{id}}:
+    motd: ''
+    address: localhost:{{variables.port}}
+    restricted: {{variables.restricted}}
+  {{/servers}}
 ip_forward: true
