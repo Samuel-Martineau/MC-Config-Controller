@@ -1,4 +1,5 @@
 # MC-Config-Controller
+![Build & Release](https://github.com/Samuel-Martineau/MC-Config-Controller/workflows/Build%20&%20Release/badge.svg)
 
 **MC-Config-Controller** is a tool to create Minecraft server network easily.
 
