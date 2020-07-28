@@ -91,10 +91,10 @@ jobs:
       - uses: geekyeggo/delete-artifact@v1
         with:
           name: ${{ matrix.artifact-name }}
-      - run: mv ${{ matrix.output-file }} ${{ matrix.artifact-name }}
-      - run: chmod +x ${{ matrix.artifact-name }}
+      - run: mv ${{ matrix.artifact-name }} ${{ matrix.output-file }}
+      - run: chmod +x ${{ matrix.output-file }}
         if: ${{ matrix.os-display-name == 'linux' || matrix.os-display-name == 'macos' }}
-      - run: zip ${{ matrix.os-display-name }}.zip ${{ matrix.artifact-name }}
+      - run: zip ${{ matrix.os-display-name }}.zip ${{ matrix.output-file }}
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
