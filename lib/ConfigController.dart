@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/config/ConfigParser.dart';
+import 'package:Config_Controller/downloaders/ForgeDownloader.dart';
+import 'package:Config_Controller/downloaders/PaperDownloader.dart';
+import 'package:Config_Controller/downloaders/WaterfallDownloader.dart';
 import 'package:Config_Controller/helpers.dart';
 import 'package:globbing/globbing.dart';
 import 'package:logger/logger.dart';
@@ -48,42 +51,42 @@ class ConfigContoller {
     final globalVars = await globalVariables;
     final serverMaps = servers.map((s) => s.toMap()).toList();
 
-    // for (final server in servers) {
-    //   for (final template in server.getFlattenExtendsTree(templates)) {
-    //     template
-    //         .getConfigDir(_configDir)
-    //         .listSync(recursive: true)
-    //         .forEach((fileSystemEntity) {
-    //       if (fileSystemEntity is File) {
-    //         final relPath = fileSystemEntity.path.replaceFirst(
-    //             '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
-    //             '');
-    //         if (relPath != 'config.json') {
-    //           final srcPath = fileSystemEntity.path;
-    //           final distPath = p.join(server.getDir(_serversDir).path, relPath);
+    for (final server in servers) {
+      for (final template in server.getFlattenExtendsTree(templates)) {
+        template
+            .getConfigDir(_configDir)
+            .listSync(recursive: true)
+            .forEach((fileSystemEntity) {
+          if (fileSystemEntity is File) {
+            final relPath = fileSystemEntity.path.replaceFirst(
+                '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
+                '');
+            if (relPath != 'config.json') {
+              final srcPath = fileSystemEntity.path;
+              final distPath = p.join(server.getDir(_serversDir).path, relPath);
 
-    //           final vars = {
-    //             'global': globalVars,
-    //             'servers': serverMaps,
-    //             'server': server.toMap()
-    //           };
+              final vars = {
+                'global': globalVars,
+                'servers': serverMaps,
+                'server': server.toMap()
+              };
 
-    //           mergeConfigFiles(File(srcPath), File(distPath), vars);
-    //         }
-    //       }
-    //     });
-    //   }
-    //   if (install) {
-    //     final downloaders = {
-    //       ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
-    //       ServerType.Waterfall:
-    //           WaterfallDownloader(_cacheDir, verbose: verbose),
-    //       ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
-    //     };
-    //     await downloaders[server.type]
-    //         .download(server.version, server.getDir(_serversDir));
-    //   }
-    // }
+              mergeConfigFiles(File(srcPath), File(distPath), vars);
+            }
+          }
+        });
+      }
+      if (install) {
+        final downloaders = {
+          ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
+          ServerType.Waterfall:
+              WaterfallDownloader(_cacheDir, verbose: verbose),
+          ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
+        };
+        await downloaders[server.type]
+            .download(server.version, server.getDir(_serversDir));
+      }
+    }
   }
 
   Future<List<Server>> getServers() async {
