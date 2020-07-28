@@ -1,6 +1,13 @@
 name: Build & Release
 
-on: push
+on:
+  push:
+    paths:
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'environment_config.yaml'
+      - 'lib/**'
+      - 'bin/**'
 
 jobs:
   create-release:

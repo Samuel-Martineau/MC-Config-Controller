@@ -17,8 +17,14 @@ class Server extends Template {
     this.type,
     this.version,
     List<String> extendsTemplates,
+    List<String> keepFiles,
     this.variables,
-  }) : super(id: id, name: name, extendsTemplates: extendsTemplates);
+  }) : super(
+          id: id,
+          name: name,
+          extendsTemplates: extendsTemplates,
+          keepFiles: keepFiles,
+        );
 
   Directory getDir(Directory serversDir) {
     return Directory(p.join(serversDir.path, id));
