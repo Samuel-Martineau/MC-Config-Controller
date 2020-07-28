@@ -1,6 +1,6 @@
 # MC-Config-Controller
 
-> **MC-Config-Controller** is a tool to create a Minecraft server network easily.
+> **MC-Config-Controller** is a tool to create Minecraft server networks easily
 
  <details>
   <summary>Table of Contents</summary>
