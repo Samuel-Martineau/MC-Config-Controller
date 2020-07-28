@@ -3,15 +3,13 @@ import 'dart:io';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/config/ConfigParser.dart';
-import 'package:Config_Controller/downloaders/PaperDownloader.dart';
-import 'package:Config_Controller/downloaders/WaterfallDownloader.dart';
 import 'package:Config_Controller/helpers.dart';
+import 'package:globbing/globbing.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
 
 import 'config/Server.dart';
 import 'config/Template.dart';
-import 'downloaders/ForgeDownloader.dart';
 
 class ConfigContoller {
   final String _path;
@@ -45,47 +43,47 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
-    await clearOldConfigFiles();
+    await clearOldConfigFiles(servers, templates);
 
     final globalVars = await globalVariables;
     final serverMaps = servers.map((s) => s.toMap()).toList();
 
-    for (final server in servers) {
-      for (final template in server.getFlattenExtendsTree(templates)) {
-        template
-            .getConfigDir(_configDir)
-            .listSync(recursive: true)
-            .forEach((fileSystemEntity) {
-          if (fileSystemEntity is File) {
-            final relPath = fileSystemEntity.path.replaceFirst(
-                '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
-                '');
-            if (relPath != 'config.json') {
-              final srcPath = fileSystemEntity.path;
-              final distPath = p.join(server.getDir(_serversDir).path, relPath);
+    // for (final server in servers) {
+    //   for (final template in server.getFlattenExtendsTree(templates)) {
+    //     template
+    //         .getConfigDir(_configDir)
+    //         .listSync(recursive: true)
+    //         .forEach((fileSystemEntity) {
+    //       if (fileSystemEntity is File) {
+    //         final relPath = fileSystemEntity.path.replaceFirst(
+    //             '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
+    //             '');
+    //         if (relPath != 'config.json') {
+    //           final srcPath = fileSystemEntity.path;
+    //           final distPath = p.join(server.getDir(_serversDir).path, relPath);
 
-              final vars = {
-                'global': globalVars,
-                'servers': serverMaps,
-                'server': server.toMap()
-              };
+    //           final vars = {
+    //             'global': globalVars,
+    //             'servers': serverMaps,
+    //             'server': server.toMap()
+    //           };
 
-              mergeConfigFiles(File(srcPath), File(distPath), vars);
-            }
-          }
-        });
-      }
-      if (install) {
-        final downloaders = {
-          ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
-          ServerType.Waterfall:
-              WaterfallDownloader(_cacheDir, verbose: verbose),
-          ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
-        };
-        await downloaders[server.type]
-            .download(server.version, server.getDir(_serversDir));
-      }
-    }
+    //           mergeConfigFiles(File(srcPath), File(distPath), vars);
+    //         }
+    //       }
+    //     });
+    //   }
+    //   if (install) {
+    //     final downloaders = {
+    //       ServerType.Paper: PaperDownloader(_cacheDir, verbose: verbose),
+    //       ServerType.Waterfall:
+    //           WaterfallDownloader(_cacheDir, verbose: verbose),
+    //       ServerType.Forge: ForgeDownloader(_cacheDir, verbose: verbose),
+    //     };
+    //     await downloaders[server.type]
+    //         .download(server.version, server.getDir(_serversDir));
+    //   }
+    // }
   }
 
   Future<List<Server>> getServers() async {
@@ -94,28 +92,37 @@ class ConfigContoller {
     final subFolders = _serversConfigDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
-      if ((await file.exists())) {
-        final rawConfig = await file.readAsString();
-        final config = ConfigParser.parseJSON(rawConfig);
-        final possibleTypes = {
-          'paper': ServerType.Paper,
-          'waterfall': ServerType.Waterfall,
-          'forge': ServerType.Forge
-        };
-        final server = Server(
-          id: folder.path.split(Platform.pathSeparator).last,
-          name: config['name'],
-          type: possibleTypes[config['type']],
-          version: MCVersion(config['version']),
-          extendsTemplates: (config['extends'] as List<dynamic>)
-              .map((v) => v.toString())
-              .toList(),
-          variables: config['variables'],
-        );
-        servers.add(server);
-        _logger.v('Found $server');
-      } else {
-        _logger.w('No config file found in ${folder.path}');
+      try {
+        if ((await file.exists())) {
+          final rawConfig = await file.readAsString();
+          final config = ConfigParser.parseJSON(rawConfig);
+          final possibleTypes = {
+            'paper': ServerType.Paper,
+            'waterfall': ServerType.Waterfall,
+            'forge': ServerType.Forge
+          };
+          final server = Server(
+            id: folder.path.split(Platform.pathSeparator).last,
+            name: config['name'],
+            type: possibleTypes[config['type']],
+            version: MCVersion(config['version']),
+            extendsTemplates: (config['extends'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+            keepFiles: (config['keepFiles'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+            variables: config['variables'],
+          );
+          servers.add(server);
+          _logger.v('Found $server');
+        } else {
+          _logger.w('No config file found in ${folder.path}');
+        }
+      } catch (e) {
+        _logger.e(
+            '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+        exit(1);
       }
     }
     return servers;
@@ -127,20 +134,29 @@ class ConfigContoller {
     final subFolders = _templatesConfigDir.listSync();
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
-      if ((await file.exists())) {
-        final rawConfig = await file.readAsString();
-        final config = ConfigParser.parseJSON(rawConfig);
-        final template = Template(
-          id: folder.path.split(Platform.pathSeparator).last,
-          name: config['name'],
-          extendsTemplates: (config['extends'] as List<dynamic>)
-              .map((v) => v.toString())
-              .toList(),
-        );
-        templates.add(template);
-        _logger.v('Found $template');
-      } else {
-        _logger.w('No config file found in ${folder.path}');
+      try {
+        if ((await file.exists())) {
+          final rawConfig = await file.readAsString();
+          final config = ConfigParser.parseJSON(rawConfig);
+          final template = Template(
+            id: folder.path.split(Platform.pathSeparator).last,
+            name: config['name'],
+            extendsTemplates: (config['extends'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+            keepFiles: (config['keepFiles'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+          );
+          templates.add(template);
+          _logger.v('Found $template');
+        } else {
+          _logger.w('No config file found in ${folder.path}');
+        }
+      } catch (e) {
+        _logger.e(
+            '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+        exit(1);
       }
     }
     return templates;
@@ -170,14 +186,37 @@ class ConfigContoller {
     return ConfigParser.parseJSON(await globalVarsFile.readAsString());
   }
 
-  void clearOldConfigFiles() async {
-    final configFiles = _serversDir.listSync(recursive: true);
-    for (FileSystemEntity configFile in configFiles) {
-      if (configFile is File) {
-        final ext = p.extension(configFile.path);
-        if (ext != '.jar') {
-          await configFile.delete();
+  void clearOldConfigFiles(
+    List<Server> servers,
+    List<Template> templates,
+  ) async {
+    final rawKeepFiles = [
+      'server.jar',
+      'forge-installer.jar',
+      'cache/mojang_**.jar',
+      'mods/sponge-**-**.jar'
+    ];
+    final serverIDs = servers.map((s) => s.id).toList();
+    for (final server in servers) {
+      final localRawKeepFiles = [...rawKeepFiles];
+      for (final template in server.getFlattenExtendsTree(templates)) {
+        localRawKeepFiles.addAll(template.keepFiles);
+      }
+      final localKeepFiles = localRawKeepFiles.map((elem) => Glob(elem));
+      final serverFiles = server.getDir(_serversDir).listSync(recursive: true);
+      for (final fileSystemEntity in serverFiles) {
+        final relPath = p.relative(fileSystemEntity.path,
+            from: server.getDir(_serversDir).path);
+        if (fileSystemEntity is File &&
+            localKeepFiles.every((glob) => !glob.match(relPath))) {
+          await fileSystemEntity.delete();
         }
+      }
+    }
+    for (final fileSystemEntity in _serversDir.listSync()) {
+      final relPath = p.relative(fileSystemEntity.path, from: _serversDir.path);
+      if (!serverIDs.contains(relPath)) {
+        await fileSystemEntity.delete(recursive: true);
       }
     }
   }

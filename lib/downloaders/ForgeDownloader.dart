@@ -29,7 +29,8 @@ class ForgeDownloader implements ServerDownloader {
   @override
   Future<void> download(MCVersion version, Directory outDir) async {
     if (!possibleVersions.contains(version)) {
-      _logger.v('There is no SpongeForge version for Minecraft v$version');
+      _logger.v(
+          'There is no SpongeForge version for Minecraft v$version. The available versions are $possibleVersions');
       exit(1);
     }
 

@@ -1,8 +1,9 @@
 {
   "name": "Lobby",
-  "type": "paper",
+  "type": "forgeee",
   "version": "1.15.2",
   "extends": ["Base Server"],
+  "keepFiles": [],
   "variables": {
     "restricted": false,
     "port": 25566

@@ -48,16 +48,25 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
   String srcFileContent;
   String targetFileContent;
 
-  // try {
-  srcFileContent =
-      ConfigParser.parseVars(await srcFile.readAsString(), variables);
-  targetFileContent =
-      ConfigParser.parseVars(await targetFile.readAsString(), variables);
-  // } on catch (e) {
-  //   logger.e(e,
-  //       'Bad template in either file ${srcFile.path} or file ${targetFile.path}');
-  //   exit(1);
-  // }
+  try {
+    srcFileContent =
+        ConfigParser.parseVars(await srcFile.readAsString(), variables);
+    targetFileContent =
+        ConfigParser.parseVars(await targetFile.readAsString(), variables);
+  } catch (e) {
+    if (e is FileSystemException &&
+        e.message == "Failed to decode data using encoding 'utf-8'") {
+      logger.v(
+          "${ext1} merging isn't supported, overwriting ${targetFile.path}...");
+      await targetFile.delete();
+      await srcFile.copy(targetFile.path);
+      return;
+    } else {
+      logger.e(e,
+          'Bad template in either file ${srcFile.path} or file ${targetFile.path}');
+      exit(1);
+    }
+  }
 
   String toWrite;
 
@@ -100,3 +109,5 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
 
   await targetFile.writeAsString(toWrite);
 }
+
+int boolToInt(bool val) => val ? 1 : 0;
