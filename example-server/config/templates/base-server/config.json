@@ -1,5 +1,4 @@
 {
   "name": "Base Server",
-  "extends": [],
-  "variables": {}
+  "extends": []
 }
