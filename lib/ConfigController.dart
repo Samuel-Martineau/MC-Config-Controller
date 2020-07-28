@@ -45,7 +45,7 @@ class ConfigContoller {
 
     await createServersDirs(servers);
 
-    await clearOldConfigFiles();
+    // await clearOldConfigFiles();
 
     final globalVars = await globalVariables;
     final serverMaps = servers.map((s) => s.toMap()).toList();
@@ -170,15 +170,15 @@ class ConfigContoller {
     return ConfigParser.parseJSON(await globalVarsFile.readAsString());
   }
 
-  void clearOldConfigFiles() async {
-    final configFiles = _serversDir.listSync(recursive: true);
-    for (FileSystemEntity configFile in configFiles) {
-      if (configFile is File) {
-        final ext = p.extension(configFile.path);
-        if (ext != '.jar') {
-          await configFile.delete();
-        }
-      }
-    }
-  }
+  // void clearOldConfigFiles() async {
+  //   final configFiles = _serversDir.listSync(recursive: true);
+  //   for (FileSystemEntity configFile in configFiles) {
+  //     if (configFile is File) {
+  //       final ext = p.extension(configFile.path);
+  //       if (ext != '.jar') {
+  //         await configFile.delete();
+  //       }
+  //     }
+  //   }
+  // }
 }
