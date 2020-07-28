@@ -1,26 +1,3 @@
-```
- ______________________
-< MC Config Controller >
- ----------------------
-   \
-    \
-      _____   _________
-     /     \_/         |
-    |                 ||
-    |                 ||
-   |    ###\  /###   | |
-   |     0  \/  0    | |
-  /|                 | |
- / |        <        |\ \
-| /|                 | | |
-| |     \_______/   |  | |
-| |                 | / /
-/||                 /|||
-   ----------------|
-        | |    | |
-        ***    ***
-       /___\  /___\
-```
 # MC-Config-Controller
 [![Build & Release](https://github.com/Samuel-Martineau/MC-Config-Controller/workflows/Build%20&%20Release/badge.svg)](https://github.com/Samuel-Martineau/MC-Config-Controller/actions)
 
