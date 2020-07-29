@@ -18,6 +18,6 @@ For more details on how to setup/install/use, go to the [wiki](https://github.co
 Created from templates made available by Stagehand under a BSD-style
 [license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/Samuel-Martineau/MC-Config-Controller/blob/master/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/Samuel-Martineau/MC-Config-Controller/blob/master/LICENSE.md) file for details
 
 MIT © [Samuel-Martineau](https://github.com/Samuel-Martineau/) & [Doudou8](https://github.com/Doudou8)
