@@ -1,9 +1,10 @@
 # MC-Config-Controller
+
 [![Build & Release](https://github.com/Samuel-Martineau/MC-Config-Controller/workflows/Build%20&%20Release/badge.svg)](https://github.com/Samuel-Martineau/MC-Config-Controller/actions)
 
 **MC-Config-Controller** is an awesome tool to create Minecraft server networks easily. It supports [Paper](https://papermc.io/), [Waterfall](https://papermc.io/) and [Forge](https://files.minecraftforge.net/).
 
-## Documentation
+## Wiki
 
 For more details on how to setup/install/use, go to the [wiki](https://github.com/Samuel-Martineau/MC-Config-Controller/wiki).
 

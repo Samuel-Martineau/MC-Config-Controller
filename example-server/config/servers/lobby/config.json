@@ -1,6 +1,6 @@
 {
   "name": "Lobby",
-  "type": "forgeee",
+  "type": "forge",
   "version": "1.15.2",
   "extends": ["Base Server"],
   "keepFiles": [],
