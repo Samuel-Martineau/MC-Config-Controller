@@ -55,6 +55,7 @@ class SpongeDownloader implements ServerDownloader {
         await cacheFile.copy(p.join(modsDir.path, fileName));
       } on SocketException catch (e) {
         _logger.e(e.message, 'Could not reach the Sponge website');
+        _logger.d(e);
         exit(1);
       }
     }
@@ -77,6 +78,7 @@ class SpongeDownloader implements ServerDownloader {
       return build;
     } on WebScraperException catch (e) {
       logger.e(e.errorMessage(), 'Could not reach the Sponge website');
+      logger.d(e);
       exit(1);
     }
   }

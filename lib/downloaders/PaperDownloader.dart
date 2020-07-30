@@ -55,6 +55,7 @@ class PaperDownloader implements ServerDownloader {
         await cacheFile.copy(p.join(outDir.path, fileName));
       } on SocketException catch (e) {
         _logger.e(e.message, 'Could not reach the Paper website');
+        _logger.d(e);
         exit(1);
       }
     }
@@ -72,6 +73,7 @@ class PaperDownloader implements ServerDownloader {
       return jsonDecode(response.body)['build'];
     } on SocketException catch (e) {
       logger.e(e.message, 'Could not reach the Paper website');
+      logger.d(e);
       exit(1);
     }
   }

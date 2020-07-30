@@ -61,6 +61,7 @@ class ForgeDownloader implements ServerDownloader {
         await cacheFile.copy(p.join(outDir.path, fileName));
       } on SocketException catch (e) {
         _logger.e(e.message, 'Could not reach the Forge website');
+        _logger.d(e);
         exit(1);
       }
     }
@@ -83,6 +84,7 @@ class ForgeDownloader implements ServerDownloader {
       return build;
     } on WebScraperException catch (e) {
       logger.e(e.errorMessage(), 'Could not reach the Forge website');
+      logger.d(e);
       exit(1);
     }
   }

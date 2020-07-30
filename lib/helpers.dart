@@ -14,6 +14,7 @@ Future<void> createDir(Directory dir) async {
     }
   } on FileSystemException catch (e) {
     logger.e(e.osError.message, 'Creation of ${dir.path} failed');
+    logger.d(e);
     exit(1);
   }
 }
@@ -28,6 +29,7 @@ Future<void> createFile(File file, {String defaultContent = ''}) async {
     }
   } on FileSystemException catch (e) {
     logger.e(e.osError.message, 'Creation of ${file.path} failed');
+    logger.d(e);
     exit(1);
   }
 }
@@ -54,16 +56,22 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
     targetFileContent =
         ConfigParser.parseVars(await targetFile.readAsString(), variables);
   } catch (e) {
-    if (e is FileSystemException &&
-        e.message == "Failed to decode data using encoding 'utf-8'") {
+    if (e.message == "Failed to decode data using encoding 'utf-8'") {
       logger.v(
           "${ext1} merging isn't supported, overwriting ${targetFile.path}...");
       await targetFile.delete();
       await srcFile.copy(targetFile.path);
       return;
+      // } else if (e.message == 'Stack Overflow') {
+      //   logger.v(
+      //       'Stack Overflow in ${srcFile.path}, overwriting ${targetFile.path}...');
+      //   await targetFile.delete();
+      //   await srcFile.copy(targetFile.path);
+      //   return;
     } else {
       logger.e(e,
           'Bad template in either file ${srcFile.path} or file ${targetFile.path}');
+      logger.d(e);
       exit(1);
     }
   }
@@ -101,6 +109,7 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
     } catch (e) {
       logger.e(
           'Bad formatting in either file ${srcFile.path} or file ${targetFile.path}');
+      logger.d(e);
       exit(1);
     }
   } else {

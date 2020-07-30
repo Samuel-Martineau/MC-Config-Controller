@@ -45,6 +45,7 @@ class Template {
         );
       } on StateError catch (e) {
         logger.e('Unresolved dependency "$templateName" in $this');
+        logger.d(e);
         exit(1);
       }
     });

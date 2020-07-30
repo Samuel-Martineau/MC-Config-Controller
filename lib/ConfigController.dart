@@ -125,6 +125,7 @@ class ConfigContoller {
       } catch (e) {
         _logger.e(
             '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+        _logger.d(e);
         exit(1);
       }
     }
@@ -159,6 +160,7 @@ class ConfigContoller {
       } catch (e) {
         _logger.e(
             '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+        _logger.d(e);
         exit(1);
       }
     }

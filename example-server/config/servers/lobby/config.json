@@ -1,8 +1,8 @@
 {
   "name": "Lobby",
-  "type": "paper",
+  "type": "forge",
   "version": "1.12.2",
-  "extends": ["Base Server"],
+  "extends": [],
   "keepFiles": [],
   "variables": {
     "restricted": false,

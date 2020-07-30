@@ -56,6 +56,7 @@ class VanillaDownloader implements ServerDownloader {
         await cacheFile.copy(p.join(localCacheDir.path, fileName));
       } on SocketException catch (e) {
         _logger.e(e.message, 'Could not reach the Mojang website');
+        _logger.d(e);
         exit(1);
       }
     }
@@ -73,6 +74,7 @@ class VanillaDownloader implements ServerDownloader {
       return url;
     } on WebScraperException catch (e) {
       logger.e(e.errorMessage(), 'Could not reach the MCVersions website');
+      logger.d(e);
       exit(1);
     }
   }

@@ -5,9 +5,9 @@ import 'package:logger/logger.dart';
 class LoggerProvider {
   static Logger _logger;
 
-  static void init(bool verbose) {
+  static void init(bool verbose, bool debug) {
     _logger = Logger(
-      filter: _CustomFilter(verbose),
+      filter: _CustomFilter(verbose, debug),
       printer: PrettyPrinter(
         methodCount: 0,
         errorMethodCount: 6,
@@ -24,14 +24,17 @@ class LoggerProvider {
 
 class _CustomFilter extends LogFilter {
   final bool _verbose;
+  final bool _debug;
 
-  _CustomFilter(this._verbose);
+  _CustomFilter(this._verbose, this._debug);
 
   @override
   bool shouldLog(LogEvent event) {
     switch (event.level) {
       case Level.verbose:
         return _verbose;
+      case Level.debug:
+        return _debug;
       default:
         return true;
     }
