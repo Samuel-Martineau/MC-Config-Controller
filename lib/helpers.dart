@@ -63,12 +63,12 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
       await targetFile.delete();
       await srcFile.copy(targetFile.path);
       return;
-      // } else if (e is StackOverflowError) {
-      //   logger.v(
-      //       'Stack Overflow in ${srcFile.path}, overwriting ${targetFile.path}...');
-      //   await targetFile.delete();
-      //   await srcFile.copy(targetFile.path);
-      //   return;
+    } else if (e is StackOverflowError) {
+      logger.v(
+          'Stack Overflow in ${srcFile.path}, overwriting ${targetFile.path}...');
+      await targetFile.delete();
+      await srcFile.copy(targetFile.path);
+      return;
     } else {
       logger.e(e,
           'Bad template in either file ${srcFile.path} or file ${targetFile.path}');
