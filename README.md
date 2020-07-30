@@ -1,4 +1,4 @@
-![Banner](https://raw.githubusercontent.com/Samuel-Martineau/MC-Config-Controller/master/logo.png)
+![Banner](https://raw.githubusercontent.com/Samuel-Martineau/MC-Config-Controller/master/images/logo.png)
 
 [![Build & Release](https://github.com/Samuel-Martineau/MC-Config-Controller/workflows/Build%20&%20Release/badge.svg)](https://github.com/Samuel-Martineau/MC-Config-Controller/actions)
 
