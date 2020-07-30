@@ -56,13 +56,14 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
     targetFileContent =
         ConfigParser.parseVars(await targetFile.readAsString(), variables);
   } catch (e) {
-    if (e.message == "Failed to decode data using encoding 'utf-8'") {
+    if (e is FileSystemException &&
+        e.message == "Failed to decode data using encoding 'utf-8'") {
       logger.v(
           "${ext1} merging isn't supported, overwriting ${targetFile.path}...");
       await targetFile.delete();
       await srcFile.copy(targetFile.path);
       return;
-      // } else if (e.message == 'Stack Overflow') {
+      // } else if (e is StackOverflowError) {
       //   logger.v(
       //       'Stack Overflow in ${srcFile.path}, overwriting ${targetFile.path}...');
       //   await targetFile.delete();
