@@ -17,7 +17,7 @@ class ConfigParser {
     return loadYaml(content);
   }
 
-  static Map<dynamic, dynamic> parseJSON(String content) {
+  static dynamic parseJSON(String content) {
     return jsonDecode(content);
   }
 
