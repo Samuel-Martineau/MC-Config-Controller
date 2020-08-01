@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/config/Template.dart';
+import 'package:json_schema/json_schema.dart';
 import 'package:path/path.dart' as p;
 
 enum ServerType { Paper, Waterfall, Forge }
@@ -48,4 +49,65 @@ class Server extends Template {
     };
     return map;
   }
+
+  static JsonSchema schema = JsonSchema.createSchema(r'''
+  {
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "required": [
+      "name",
+      "type",
+      "version",
+      "extends",
+      "keepFiles",
+      "removeFiles",
+      "variables"
+    ],
+    "properties": {
+      "name": {
+        "$id": "#/properties/name",
+        "type": "string"
+      },
+      "type": {
+        "enum": [
+          "forge",
+          "paper",
+          "waterfall"
+        ]
+      },
+      "version": {
+        "pattern": "^\\d+\\.\\d+(.\\d+)?$"
+      },
+      "extends": {
+        "$id": "#/properties/extends",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      "keepFiles": {
+        "$id": "#/properties/keepFiles",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      "removeFiles": {
+        "$id": "#/properties/removeFiles",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      "variables": {
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  }
+  ''');
 }

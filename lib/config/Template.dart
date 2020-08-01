@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Config_Controller/Logger.dart';
+import 'package:json_schema/json_schema.dart';
 import 'package:path/path.dart' as p;
 
 class Template {
@@ -59,4 +60,49 @@ class Template {
   String toString() {
     return '${runtimeType} "$name" (ID: $id)';
   }
+
+  static JsonSchema schema = JsonSchema.createSchema(r'''
+  {
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "required": [
+      "name",
+      "extends",
+      "keepFiles",
+      "removeFiles"
+    ],
+    "properties": {
+      "name": {
+        "$id": "#/properties/name",
+        "type": "string"
+    	},
+      "extends": {
+        "$id": "#/properties/extends",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      "keepFiles": {
+        "$id": "#/properties/keepFiles",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      "removeFiles": {
+        "$id": "#/properties/removeFiles",
+        "type": "array",
+        "additionalItems": true,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+  ''');
 }

@@ -100,6 +100,11 @@ class ConfigContoller {
         if ((await file.exists())) {
           final rawConfig = await file.readAsString();
           final config = ConfigParser.parseJSON(rawConfig);
+          if (!Server.schema.validate(config)) {
+            _logger.e(
+                '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+            exit(1);
+          }
           final possibleTypes = {
             'paper': ServerType.Paper,
             'waterfall': ServerType.Waterfall,
@@ -114,6 +119,9 @@ class ConfigContoller {
                 .map((v) => v.toString())
                 .toList(),
             keepFiles: (config['keepFiles'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+            removeFiles: (config['removeFiles'] as List<dynamic>)
                 .map((v) => v.toString())
                 .toList(),
             variables: config['variables'],
@@ -143,6 +151,11 @@ class ConfigContoller {
         if ((await file.exists())) {
           final rawConfig = await file.readAsString();
           final config = ConfigParser.parseJSON(rawConfig);
+          if (!Template.schema.validate(config)) {
+            _logger.e(
+                '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
+            exit(1);
+          }
           final template = Template(
             id: folder.path.split(Platform.pathSeparator).last,
             name: config['name'],
@@ -150,6 +163,9 @@ class ConfigContoller {
                 .map((v) => v.toString())
                 .toList(),
             keepFiles: (config['keepFiles'] as List<dynamic>)
+                .map((v) => v.toString())
+                .toList(),
+            removeFiles: (config['removeFiles'] as List<dynamic>)
                 .map((v) => v.toString())
                 .toList(),
           );
@@ -205,7 +221,7 @@ class ConfigContoller {
     final serverIDs = servers.map((s) => s.id).toList();
     for (final server in servers) {
       final localRawKeepFiles = [...rawKeepFiles];
-      final localRawRemoveFiles = [...rawKeepFiles];
+      final localRawRemoveFiles = [];
       for (final template in server.getFlattenExtendsTree(templates)) {
         localRawKeepFiles.addAll(template.keepFiles);
         localRawRemoveFiles.addAll(template.removeFiles);
