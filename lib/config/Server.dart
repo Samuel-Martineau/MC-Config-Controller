@@ -18,12 +18,14 @@ class Server extends Template {
     this.version,
     List<String> extendsTemplates,
     List<String> keepFiles,
+    List<String> removeFiles,
     this.variables,
   }) : super(
           id: id,
           name: name,
           extendsTemplates: extendsTemplates,
           keepFiles: keepFiles,
+          removeFiles: removeFiles,
         );
 
   Directory getDir(Directory serversDir) {

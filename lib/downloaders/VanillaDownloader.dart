@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/downloaders/ServerDownloader.dart';
-import 'package:Config_Controller/helpers.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -41,19 +40,16 @@ class VanillaDownloader implements ServerDownloader {
         (cachedDownload) => p.basename(cachedDownload.path) == cacheFileName,
         orElse: () => null);
 
-    final localCacheDir = Directory(p.join(outDir.path, 'cache'));
-    await createDir(localCacheDir);
-
     if (cachedDownload != null) {
       _logger.i('Already downloaded $cacheFileName, using cache');
-      await cachedDownload.copy(p.join(localCacheDir.path, fileName));
+      await cachedDownload.copy(p.join(outDir.path, fileName));
     } else {
       try {
         final response = await http.get(url);
         final cacheFile = await File(p.join(_cacheDir.path, cacheFileName))
             .writeAsBytes(response.bodyBytes);
         _cachedDownloads.add(cacheFile);
-        await cacheFile.copy(p.join(localCacheDir.path, fileName));
+        await cacheFile.copy(p.join(outDir.path, fileName));
       } on SocketException catch (e) {
         _logger.e(e.message, 'Could not reach the Mojang website');
         _logger.d(e);

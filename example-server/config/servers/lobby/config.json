@@ -2,8 +2,9 @@
   "name": "Lobby",
   "type": "forge",
   "version": "1.12.2",
-  "extends": [],
+  "extends": ["Base Server"],
   "keepFiles": [],
+  "removeFiles": [],
   "variables": {
     "restricted": false,
     "port": 25566

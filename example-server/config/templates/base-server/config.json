@@ -1,5 +1,6 @@
 {
   "name": "Base Server",
   "extends": [],
-  "keepFiles": []
+  "keepFiles": [],
+  "removeFiles": []
 }

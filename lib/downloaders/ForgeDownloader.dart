@@ -4,6 +4,7 @@ import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/downloaders/ServerDownloader.dart';
 import 'package:Config_Controller/downloaders/SpongeDownloader.dart';
+import 'package:Config_Controller/downloaders/VanillaDownloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -17,10 +18,12 @@ class ForgeDownloader implements ServerDownloader {
   Logger _logger;
 
   SpongeDownloader _spongeDownloader;
+  VanillaDownloader _vanillaDownloader;
   List<File> _cachedDownloads;
 
   ForgeDownloader(this._cacheDir, {this.verbose = false}) {
     _spongeDownloader = SpongeDownloader(_cacheDir, verbose: verbose);
+    _vanillaDownloader = VanillaDownloader(_cacheDir, verbose: verbose);
     _cachedDownloads =
         _cacheDir.listSync().map((file) => File(file.path)).toList();
     _logger = LoggerProvider.logger;
@@ -68,6 +71,7 @@ class ForgeDownloader implements ServerDownloader {
     _logger.i('Done downloading $cacheFileName');
 
     await _spongeDownloader.download(version, outDir);
+    await _vanillaDownloader.download(version, outDir);
   }
 
   static Future<String> getLatestBuild(MCVersion version) async {

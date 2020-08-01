@@ -5,6 +5,7 @@ import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/MCVersion.dart';
 import 'package:Config_Controller/downloaders/ServerDownloader.dart';
 import 'package:Config_Controller/downloaders/VanillaDownloader.dart';
+import 'package:Config_Controller/helpers.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -61,7 +62,9 @@ class PaperDownloader implements ServerDownloader {
     }
     _logger.i('Done downloading $cacheFileName');
 
-    await _vanillaDownloader.download(version, outDir);
+    final localCacheDir = Directory(p.join(outDir.path, 'cache'));
+    await createDir(localCacheDir);
+    await _vanillaDownloader.download(version, localCacheDir);
   }
 
   static Future<String> getLatestBuild(MCVersion version) async {

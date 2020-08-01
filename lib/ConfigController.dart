@@ -7,6 +7,7 @@ import 'package:Config_Controller/downloaders/ForgeDownloader.dart';
 import 'package:Config_Controller/downloaders/PaperDownloader.dart';
 import 'package:Config_Controller/downloaders/WaterfallDownloader.dart';
 import 'package:Config_Controller/helpers.dart';
+import 'package:archive/archive_io.dart';
 import 'package:globbing/globbing.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -38,13 +39,15 @@ class ConfigContoller {
     _logger = LoggerProvider.logger;
   }
 
-  void generateConfig(bool install) async {
+  void generateConfig(bool install, bool shouldMakeBackup) async {
     await createDirs();
 
     final servers = await getServers();
     final templates = await getTemplates();
 
     await createServersDirs(servers);
+
+    if (shouldMakeBackup) makeBackup();
 
     await clearOldConfigFiles(servers, templates);
 
@@ -53,10 +56,8 @@ class ConfigContoller {
 
     for (final server in servers) {
       for (final template in server.getFlattenExtendsTree(templates)) {
-        template
-            .getConfigDir(_configDir)
-            .listSync(recursive: true)
-            .forEach((fileSystemEntity) {
+        for (final fileSystemEntity
+            in template.getConfigDir(_configDir).listSync(recursive: true)) {
           if (fileSystemEntity is File) {
             final relPath = fileSystemEntity.path.replaceFirst(
                 '${template.getConfigDir(_configDir).path}${Platform.pathSeparator}',
@@ -71,10 +72,10 @@ class ConfigContoller {
                 'server': server.toMap()
               };
 
-              mergeConfigFiles(File(srcPath), File(distPath), vars);
+              await mergeConfigFiles(File(srcPath), File(distPath), vars);
             }
           }
-        });
+        }
       }
       if (install) {
         final downloaders = {
@@ -204,17 +205,27 @@ class ConfigContoller {
     final serverIDs = servers.map((s) => s.id).toList();
     for (final server in servers) {
       final localRawKeepFiles = [...rawKeepFiles];
+      final localRawRemoveFiles = [...rawKeepFiles];
       for (final template in server.getFlattenExtendsTree(templates)) {
         localRawKeepFiles.addAll(template.keepFiles);
+        localRawRemoveFiles.addAll(template.removeFiles);
       }
       final localKeepFiles = localRawKeepFiles.map((elem) => Glob(elem));
+      final localRemoveFiles = localRawRemoveFiles.map((elem) => Glob(elem));
       final serverFiles = server.getDir(_serversDir).listSync(recursive: true);
       for (final fileSystemEntity in serverFiles) {
-        final relPath = p.relative(fileSystemEntity.path,
-            from: server.getDir(_serversDir).path);
-        if (fileSystemEntity is File &&
-            localKeepFiles.every((glob) => !glob.match(relPath))) {
-          await fileSystemEntity.delete();
+        final relPath = p.relative(
+          fileSystemEntity.path,
+          from: server.getDir(_serversDir).path,
+        );
+        if (fileSystemEntity is File) {
+          if (localKeepFiles.any((glob) => glob.match(relPath))) {
+            if (localRemoveFiles.any((glob) => glob.match(relPath))) {
+              await fileSystemEntity.delete();
+            }
+          } else {
+            await fileSystemEntity.delete();
+          }
         }
       }
     }
@@ -224,5 +235,20 @@ class ConfigContoller {
         await fileSystemEntity.delete(recursive: true);
       }
     }
+  }
+
+  void makeBackup() {
+    final zipEncoder = ZipFileEncoder();
+    final archiveName = 'servers-${DateTime.now().toIso8601String()}.zip';
+    final archvivePath = p.join(_rootDir.path, archiveName);
+    zipEncoder.create(archvivePath);
+    for (final file in _serversDir.listSync(recursive: true)) {
+      if (file is File) {
+        _logger.v('Adding ${file.path} to the archive...');
+        zipEncoder.addFile(file);
+      }
+    }
+    zipEncoder.close();
+    _logger.i('Done backuping ${_serversDir.path} into $archvivePath');
   }
 }

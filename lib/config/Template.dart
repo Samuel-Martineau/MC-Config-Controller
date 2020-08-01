@@ -8,12 +8,14 @@ class Template {
   final String name;
   final List<String> extendsTemplates;
   final List<String> keepFiles;
+  final List<String> removeFiles;
 
   const Template({
     this.id,
     this.name,
     this.extendsTemplates,
     this.keepFiles,
+    this.removeFiles,
   });
 
   Directory getConfigDir(Directory configDir) {
