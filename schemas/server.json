@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$id": "http://example.com/example.json",
+  "$id": "https://raw.githubusercontent.com/Samuel-Martineau/MC-Config-Controller/master/schemas/server.json",
   "type": "object",
   "required": [
     "name",

@@ -9,6 +9,7 @@ import 'package:Config_Controller/downloaders/WaterfallDownloader.dart';
 import 'package:Config_Controller/helpers.dart';
 import 'package:archive/archive_io.dart';
 import 'package:globbing/globbing.dart';
+import 'package:json_schema/json_schema.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
 
@@ -94,13 +95,15 @@ class ConfigContoller {
     // ignore: omit_local_variable_types
     final List<Server> servers = [];
     final subFolders = _serversConfigDir.listSync();
+    final schema = await JsonSchema.createSchemaFromUrl(Server.schemaURL);
+
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
       try {
         if ((await file.exists())) {
           final rawConfig = await file.readAsString();
           final config = ConfigParser.parseJSON(rawConfig);
-          if (!Server.schema.validate(config)) {
+          if (!schema.validate(config)) {
             _logger.e(
                 '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
             exit(1);
@@ -145,13 +148,15 @@ class ConfigContoller {
     // ignore: omit_local_variable_types
     final List<Template> templates = [];
     final subFolders = _templatesConfigDir.listSync();
+    final schema = await JsonSchema.createSchemaFromUrl(Template.schemaURL);
+
     for (Directory folder in subFolders) {
       final file = File(p.join(folder.path, 'config.json'));
       try {
         if ((await file.exists())) {
           final rawConfig = await file.readAsString();
           final config = ConfigParser.parseJSON(rawConfig);
-          if (!Template.schema.validate(config)) {
+          if (!schema.validate(config)) {
             _logger.e(
                 '${folder.path}${Platform.pathSeparator}config.json isn\'t valid');
             exit(1);

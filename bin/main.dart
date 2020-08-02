@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:Config_Controller/ConfigController.dart';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/UpdateManager.dart';
 import 'package:args/args.dart';
+import 'package:json_schema/vm.dart';
 
 Future<void> main(List<String> arguments) async {
   final stopwatch = Stopwatch()..start();
@@ -23,6 +26,8 @@ Future<void> main(List<String> arguments) async {
     return logger.e('Please specify a folder (config-controller -p <path>)');
   }
 
+  configureJsonSchemaForVm();
+
   await UpdateManager.printUpdateMessage();
 
   final cfgController = ConfigContoller(parsed['path']);
@@ -33,4 +38,5 @@ Future<void> main(List<String> arguments) async {
 
   logger.i(
       'Done in ${stopwatch.elapsed.inSeconds}s (${stopwatch.elapsedMilliseconds} ms) !');
+  exit(0);
 }
