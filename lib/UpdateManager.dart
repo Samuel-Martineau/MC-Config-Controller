@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/environment_config.dart';
@@ -20,10 +21,16 @@ Consider downloading the latest version here => https://github.com/Samuel-Martin
   }
 
   static Future<String> get latestVersion async {
-    final response = await http.get(
-        'https://api.github.com/repos/Samuel-Martineau/MC-Config-Controller/releases/latest');
-    final parsed = jsonDecode(response.body);
-    return parsed['tag_name'];
+    try {
+      final response = await http.get(
+          'https://api.github.com/repos/Samuel-Martineau/MC-Config-Controller/releases/latest');
+      final parsed = jsonDecode(response.body);
+      return parsed['tag_name'];
+    } catch (e) {
+      LoggerProvider.logger
+          .e('Unable to fetch latest version... Are you offline ?');
+      exit(1);
+    }
   }
 
   static String get currentVersion {
