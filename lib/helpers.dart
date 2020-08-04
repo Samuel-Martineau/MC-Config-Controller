@@ -86,20 +86,26 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
         case '.yml':
           final parsedSrc = ConfigParser.parseYAML(srcFileContent);
           final parsedTarget = ConfigParser.parseYAML(targetFileContent);
-          toWrite =
-              ConfigSerializer.serializeYAML({...parsedSrc, ...parsedTarget});
+          toWrite = ConfigSerializer.serializeYAML({
+            ...parsedTarget,
+            ...parsedSrc,
+          });
           break;
         case '.json':
           final parsedSrc = ConfigParser.parseJSON(srcFileContent);
           final parsedTarget = ConfigParser.parseJSON(targetFileContent);
-          toWrite =
-              ConfigSerializer.serializeJSON({...parsedSrc, ...parsedTarget});
+          toWrite = ConfigSerializer.serializeJSON({
+            ...parsedTarget,
+            ...parsedSrc,
+          });
           break;
         case '.properties':
           final parsedSrc = ConfigParser.parseProperties(srcFileContent);
           final parsedTarget = ConfigParser.parseProperties(targetFileContent);
-          toWrite = ConfigSerializer.serializeProperties(
-              {...parsedSrc, ...parsedTarget});
+          toWrite = ConfigSerializer.serializeProperties({
+            ...parsedTarget,
+            ...parsedSrc,
+          });
           break;
         default:
           logger.v(
