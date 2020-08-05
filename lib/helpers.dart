@@ -102,8 +102,6 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
         case '.properties':
           final parsedSrc = ConfigParser.parseProperties(srcFileContent);
           final parsedTarget = ConfigParser.parseProperties(targetFileContent);
-          print(parsedSrc);
-          print(parsedTarget);
           toWrite = ConfigSerializer.serializeProperties({
             ...parsedTarget,
             ...parsedSrc,
