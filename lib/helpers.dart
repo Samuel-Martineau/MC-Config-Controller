@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Config_Controller/Logger.dart';
 import 'package:Config_Controller/config/ConfigParser.dart';
 import 'package:Config_Controller/config/ConfigSerializer.dart';
+import 'package:merge_map/merge_map.dart';
 import 'package:path/path.dart' as p;
 
 Future<void> createDir(Directory dir) async {
@@ -86,26 +87,20 @@ void mergeConfigFiles(File srcFile, File targetFile, Map variables) async {
         case '.yml':
           final parsedSrc = ConfigParser.parseYAML(srcFileContent);
           final parsedTarget = ConfigParser.parseYAML(targetFileContent);
-          toWrite = ConfigSerializer.serializeYAML({
-            ...parsedTarget,
-            ...parsedSrc,
-          });
+          toWrite = ConfigSerializer.serializeYAML(
+              mergeMap([parsedSrc, parsedTarget]));
           break;
         case '.json':
           final parsedSrc = ConfigParser.parseJSON(srcFileContent);
           final parsedTarget = ConfigParser.parseJSON(targetFileContent);
-          toWrite = ConfigSerializer.serializeJSON({
-            ...parsedTarget,
-            ...parsedSrc,
-          });
+          toWrite = ConfigSerializer.serializeJSON(
+              mergeMap([parsedSrc, parsedTarget]));
           break;
         case '.properties':
           final parsedSrc = ConfigParser.parseProperties(srcFileContent);
           final parsedTarget = ConfigParser.parseProperties(targetFileContent);
-          toWrite = ConfigSerializer.serializeProperties({
-            ...parsedTarget,
-            ...parsedSrc,
-          });
+          toWrite = ConfigSerializer.serializeProperties(
+              mergeMap([parsedSrc, parsedTarget]));
           break;
         default:
           logger.v(
