@@ -28,7 +28,7 @@ class ConfigParser {
         .split('\n')
         .map((line) => regex.firstMatch(line))
         .where((element) => element != null)
-        .forEach((match) => object[match.group(1)] = object[match.group(2)]);
+        .forEach((match) => object[match.group(1)] = match.group(2));
     return object;
   }
 }
