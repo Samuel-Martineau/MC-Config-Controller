@@ -8,9 +8,9 @@ environment:
 
 dependencies:
   args: ^1.6.0
-  http: ^0.12.2
+  http: ">=0.12.2 <0.14.0"
   path: ^1.7.0
-  web_scraper: ^0.0.6
+  web_scraper: ">=0.0.6 <0.2.0"
   yamlicious: ^0.1.0
   yaml: ^2.2.1
   logger: ^0.9.1
@@ -19,7 +19,7 @@ dependencies:
   liquid_engine: ^0.1.2
   globbing: ^0.3.1
   archive: ^2.0.13
-  json_schema: ^2.2.1
+  json_schema: ">=2.2.1 <5.0.0"
   merge_map: ^1.0.2
   uuid: 2.2.0
   quiver: ^2.1.3
