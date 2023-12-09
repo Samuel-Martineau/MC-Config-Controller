@@ -11,7 +11,7 @@ For more details on how to setup/install/use, go to the [wiki](https://github.co
 ## Authors
 
 - **[Samuel Martineau](https://github.com/Samuel-Martineau/)**
-- **[Vu Dang Khoa Chiem](https://github.com/Doudou8)**
+- **[Vu Dang Khoa Chiem](https://github.com/dkchiem)**
 
 ## License
 
